@@ -5,11 +5,11 @@
 # ======= runtime options ======== #
 verbose = True  # True for more informative output statements
 debug = True    # True for output checks during reconstruction
-nthreads = 8     # set to the number of CPUs available, more is better
+nthreads = 32     # set to the number of CPUs available, more is better
 # ================================ #
 
 # ========= file handling options ========= #
-handle = 'default'  # string to identify the run; used to set filenames
+handle = 'CATALPTCICz0.466G960S1005638091_zspace'  # string to identify the run; used to set filenames
 output_folder = 'revolver_test/'   # /path/to/folder/ where output should be placed
 # ========================================= #
 
@@ -72,3 +72,59 @@ random_posn_cols = [0, 1, 2]
 # if galaxy data has FKP weights, randoms are assumed to have FKP weights too
 # all other galaxy weights are ignored for randoms
 # =========================== #
+
+# ========== void-finding choices ============= #
+run_voxelvoids = False  # watershed void-finding based on particle-mesh density field interpolation in voxels
+run_zobov = False   # watershed void-finding (using ZOBOV) based on Voronoi tessellation
+# these two options are not mutually exclusive - 2 sets of voids can be produced if desired
+
+# for survey-like data only: set redshift limits
+z_min = 0.43        # minimum redshift extent of the data
+z_max = 0.70        # maximum redshift extent of the data
+# these limits are used to prune output void catalogues and to terminate the tessellation in ZOBOV
+# NOTES: 1. always set z_min >= z_low_cut and z_max <= z_high_cut
+# 2. do not set z_min < minimum redshift of the data or z_max > max redshift – will cause tessellation leakage!
+
+void_prefix = 'Voids'   # string used in naming void output files
+min_dens_cut = 1.0  # void minimum galaxy number density (in units of mean density) reqd to qualify
+use_barycentres = True  # if True, additionally calculate void barycentre positions
+
+# -- additional bonus: 'supercluster' options -- #
+find_clusters = False   # if run_zobov is True, this step will be significantly slower
+cluster_prefix = 'Clusters'  # prefix used for naming supercluster catalogue files
+max_dens_cut = 1.0  # cluster maximum galaxy density (in units of mean density) reqd to qualify
+# ============================================= #
+
+# ========== ZOBOV-specific options ============ #
+# all ignored if run_zobov = False
+
+# -- Tessellation options -- #
+do_tessellation = True    # if True, does tessellation; if False, only post-processes previous run with same handle
+# guards are used to stabilise the tessellation for surveys; increase this number if the survey volume is a
+# small fraction of that of the smallest cube required to fully enclose it
+guard_nums = 30     
+use_mpi = False
+# use MPI if you have several (~10) CPUs available, otherwise it is generally faster to run without
+zobov_box_div = 2   # partition tessellation job into (zobov_box_div)^3 chunks (run in parallel, if using MPI)
+zobov_buffer = 0.08  # fraction of box length overlap between sub-boxes
+# -------------------------- #
+
+# -- survey data handling options -- #
+# (if is_box==True, these options are ignored)
+mask_file = ''       # path to Healpix FITS file containing the survey mask
+use_z_wts = True     # set True if survey n(z) is not uniform
+use_syst_wts = True  # set True to use galaxy systematic weights
+use_completeness_wts = True  # set True to account for angular variations in survey completeness
+mock_file = ''       # path to file containing pre-computed buffer mocks (saves time)
+# if mock_file is not specified, new buffer mock positions are computed
+mock_dens_ratio = 10.   # if computing buffer mocks, ratio of buffer mock densities to mean galaxy number density
+# ---------------------------------- #
+
+# --- void options ---- #
+void_min_num = 5    # minimum number of void member galaxies reqd to qualify (for surveys, set = 5 to be conservative)
+# --------------------- #
+
+# -- bonus 'supercluster' options -- #
+cluster_min_num = 5   # minimum number of void member galaxies reqd to qualify
+# ---------------------------------- #
+# ===================================== #

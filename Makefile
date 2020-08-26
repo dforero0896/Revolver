@@ -1,11 +1,11 @@
 export C_INCLUDE_PATH=/usr/lib/openmpi/include
 
 # compiler choice
-CC    = gcc
+CC    = ${CONDA_PREFIX}/bin/x86_64-conda_cos6-linux-gnu-gcc
 
-all: qhull voboz fastmodules
+all: fastmodules
 
-.PHONY : qhull voboz fastmodules
+.PHONY : fastmodules
 
 qhull:
 	make -C qhull/src
