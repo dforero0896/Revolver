@@ -104,7 +104,13 @@ def allocate_gal_cic(
       weight = w[i]
     else:
       weight = 1
-
+    if (wrap): 
+      x[i] = (x[i] + boxsize) % boxsize
+      y[i] = (y[i] + boxsize) % boxsize
+      z[i] = (z[i] + boxsize) % boxsize
+    #if (x[i]>=boxsize) : x[i]-=boxsize
+    #if (y[i]>=boxsize) : y[i]-=boxsize
+    #if (z[i]>=boxsize) : z[i]-=boxsize
     xpos = (x[i] - xmin)*oneoverbinsize
     ypos = (y[i] - ymin)*oneoverbinsize
     zpos = (z[i] - zmin)*oneoverbinsize
@@ -139,7 +145,7 @@ def allocate_gal_cic(
       if(izp >= nbins):
         izp = 0
         mdz = 0.0
-
+    
     delta[ix,  iy,  iz]  += mdx * mdy * mdz * weight
     delta[ixp, iy,  iz]  += ddx * mdy * mdz * weight
     delta[ix,  iyp, iz]  += mdx * ddy * mdz * weight
