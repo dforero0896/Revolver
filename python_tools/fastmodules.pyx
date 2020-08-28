@@ -104,10 +104,11 @@ def allocate_gal_cic(
       weight = w[i]
     else:
       weight = 1
-    if (wrap): 
-      x[i] = (x[i] + boxsize) % boxsize
-      y[i] = (y[i] + boxsize) % boxsize
-      z[i] = (z[i] + boxsize) % boxsize
+    
+    #if (wrap): 
+    #  x[i] = (x[i] + boxsize) % boxsize
+    #  y[i] = (y[i] + boxsize) % boxsize
+    #  z[i] = (z[i] + boxsize) % boxsize
     #if (x[i]>=boxsize) : x[i]-=boxsize
     #if (y[i]>=boxsize) : y[i]-=boxsize
     #if (z[i]>=boxsize) : z[i]-=boxsize

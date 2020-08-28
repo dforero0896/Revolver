@@ -75,4 +75,3 @@ def main_py_tpcf():
 
 if __name__ == '__main__':
     main_ext_tpcf()
-    main_py_tpcf()

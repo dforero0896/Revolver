@@ -5,3 +5,11 @@ Postrecon shape: (6214031, 3)
 Computing pre_recon correlation function.
 Building data KDTree
 Counting DD.
+Computing post_recon correlation function.
+Building data KDTree
+Counting DD.
+(40,) (40,)
+
+real	146m15.171s
+user	145m10.126s
+sys	0m7.193s

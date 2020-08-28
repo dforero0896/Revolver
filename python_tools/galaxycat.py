@@ -4,7 +4,7 @@ import healpy as hp
 import os
 from astropy.io import fits
 from python_tools.cosmology import Cosmology
-
+import pandas as pd
 
 class GalaxyCatalogue:
 
@@ -124,7 +124,8 @@ class GalaxyCatalogue:
                     data = np.load(input_file)
                 else:
                     # default is assumed to be ASCII file format
-                    data = np.loadtxt(input_file)
+                    #data = np.loadtxt(input_file)
+                    data = pd.read_csv(input_file, delim_whitespace=True, engine='c').values
 
                 # position information is ra, dec and redshift
                 self.ra = data[:, posn_cols[0]]
