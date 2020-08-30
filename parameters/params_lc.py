@@ -22,10 +22,10 @@ omega_m = 0.307115  # used for reconstruction and to convert redshifts to distan
 do_recon = True     # if False, no reconstruction is performed and other recon options are ignored
 nbins = 512     # the number of grid cells per side of the box
 padding = 200.  # for survey data, the extra 'padding' for the cubic box, in Mpc/h
-smooth = 10.    # smoothing scale in Mpc/h
-bias = 1.92        # the linear galaxy/tracer bias value
-f = 0.743         # the linear growth rate at the mean redshift
-niter = 3       # number of iterations in the FFT reconstruction method, 3 is sufficient
+smooth = 15.    # smoothing scale in Mpc/h
+bias = 1.4        # the linear galaxy/tracer bias value
+f = 0.82        # the linear growth rate at the mean redshift
+niter = 3       # number of iterations in the FFT reconstruction method, 3 is sufficient with z=0.5 f=0.754
 # NOTE: for box data, reconstruction assumes plane-parallel approximation with single l-o-s along the box z-axis!!
 # ========================================= #
 
