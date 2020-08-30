@@ -10,6 +10,7 @@ nthreads = 32     # set to the number of CPUs available, more is better
 
 # ========= file handling options ========= #
 handle = 'CATALPTCICz0.466G960S1005638091_zspace'  # string to identify the run; used to set filenames
+habdle_ran = ''
 output_folder = 'revolver_test/'   # /path/to/folder/ where output should be placed
 # ========================================= #
 

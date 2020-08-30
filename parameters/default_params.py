@@ -10,6 +10,7 @@ nthreads = 4     # set to the number of CPUs available, more is better
 
 # ========= file handling options ========= #
 handle = 'default'  # string to identify the run; used to set filenames
+handle_ran = 'default_ran'
 output_folder = ''   # /path/to/folder/ where output should be placed
 # ========================================= #
 

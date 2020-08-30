@@ -342,6 +342,7 @@ class Recon:
         """
 
         for c in [self.cat, self.ran]:
+            if c is None: continue
             shift_x, shift_y, shift_z = \
                 self.get_shift(c, self.psi_x.real, self.psi_y.real, self.psi_z.real, use_newpos=True)
             c.newx += shift_x

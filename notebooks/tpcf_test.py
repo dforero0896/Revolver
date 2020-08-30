@@ -58,7 +58,7 @@ def main_fcfc_lc():
     post_recon_fn = [os.path.splitext(post_recon)[0]+"."+s for s in ['dd', 'ds', 'ss', '2pcf']]
     if not os.path.isfile(pre_recon_fn[-1]):
         subprocess.check_call(["bin/2pcf_lc", "--conf=notebooks/fcfc_lc.conf", f"--data={pre_recon}", f"--rand={pre_recon_ran}", f"--dd={pre_recon_fn[0]}", f"--dr={pre_recon_fn[1]}", f"--rr={pre_recon_fn[2]}", f"--output={pre_recon_fn[3]}"])
-    if not os.path.isfile(post_recon_fn[-1]):
+    if True:#not os.path.isfile(post_recon_fn[-1]):
         subprocess.check_call(["bin/2pcf_lc", "--conf=notebooks/fcfc_lc.conf", f"--data={post_recon}", f"--rand={post_recon_ran}", f"--dd={post_recon_fn[0]}", f"--dr={post_recon_fn[1]}", f"--rr={post_recon_fn[2]}", f"--output={post_recon_fn[3]}"])
     pre_2pcf = pd.read_csv(pre_recon_fn[3], delim_whitespace=True, engine='c', names = ['s', 'mono', 'quad', 'hexa'])
     post_2pcf = pd.read_csv(post_recon_fn[3], delim_whitespace=True, engine='c', names = ['s', 'mono', 'quad', 'hexa'])
@@ -165,4 +165,5 @@ def main_astroml():
 
 if __name__ == '__main__':
     #main_corrfunc()
+    main_fcfc_box()
     main_fcfc_lc()

@@ -136,6 +136,9 @@ def allocate_gal_cic(
       if(ixp >= nbins): ixp -= nbins
       if(iyp >= nbins): iyp -= nbins
       if(izp >= nbins): izp -= nbins
+      if(ix >= nbins): ix -= nbins
+      if(iy >= nbins): iy -= nbins
+      if(iz >= nbins): iz -= nbins
     else:
       if(ixp >= nbins):
         ixp = 0
