@@ -10,6 +10,7 @@ nthreads = 32     # set to the number of CPUs available, more is better
 
 # ========= file handling options ========= #
 handle = 'Patchy-Mocks-DR12CMASSLOWZTOT-N-V6C-Portsmouth-mass_0001'  # string to identify the run; used to set filenames
+handle_ran = 'Random-DR12CMASSLOWZTOT-N-V6C-x20-VT-FC'
 output_folder = 'revolver_test/'   # /path/to/folder/ where output should be placed
 # ========================================= #
 

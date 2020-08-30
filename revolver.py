@@ -88,7 +88,8 @@ if parms.do_recon:
 
     # save real-space positions to file
     root = parms.output_folder + parms.handle + '_pos'
-    recon.export_shift_pos(root, rsd_only=True)
+    root2 = parms.output_folder + parms.handle_ran + '_pos'
+    recon.export_shift_pos(root, root2=root2, rsd_only=False)
 
     print(" ==== Done reconstruction ====\n")
     end = time.time()
