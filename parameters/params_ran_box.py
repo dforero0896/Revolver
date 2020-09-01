@@ -9,8 +9,8 @@ nthreads = 32     # set to the number of CPUs available, more is better
 # ================================ #
 
 # ========= file handling options ========= #
-handle = 'Patchy-Mocks-DR12CMASSLOWZTOT-N-V6C-Portsmouth-mass_0001'  # string to identify the run; used to set filenames
-handle_ran = 'Random-DR12CMASSLOWZTOT-N-V6C-x20-VT-FC'
+handle = 'CATALPTCICz0.466G960S1005638091_zspace_wran'  # string to identify the run; used to set filenames
+handle_ran = 'box_uniform_random_seed1_0-2500'
 output_folder = 'revolver_test/'   # /path/to/folder/ where output should be placed
 # ========================================= #
 
@@ -22,15 +22,15 @@ omega_m = 0.307115  # used for reconstruction and to convert redshifts to distan
 do_recon = True     # if False, no reconstruction is performed and other recon options are ignored
 nbins = 512     # the number of grid cells per side of the box
 padding = 200.  # for survey data, the extra 'padding' for the cubic box, in Mpc/h
-smooth = 15.    # smoothing scale in Mpc/h
-bias = 1.4        # the linear galaxy/tracer bias value
-f = 0.82        # the linear growth rate at the mean redshift
+smooth = 10.    # smoothing scale in Mpc/h
+bias = 1.92        # the linear galaxy/tracer bias value
+f = 0.743         # the linear growth rate at the mean redshift
 niter = 3       # number of iterations in the FFT reconstruction method, 3 is sufficient with z=0.5 f=0.754
 # NOTE: for box data, reconstruction assumes plane-parallel approximation with single l-o-s along the box z-axis!!
 # ========================================= #
 
 # ======= input galaxy/tracer data options =========== #
-tracer_file = 'revolver_test/Patchy-Mocks-DR12CMASSLOWZTOT-N-V6C-Portsmouth-mass_0001.dat'     # /path/to/file with input data
+tracer_file = 'revolver_test/CATALPTCICz0.466G960S1005638091_zspace.dat'     # /path/to/file with input data
 tracer_file_type = 3  # 1 for FITS file, 2 for array in numpy pickle format (.npy), 3 for array in ASCII format
 # NOTE: for FITS files, the tracer coordinates should be specified using appropriate field names
 # current options are 'RA', 'DEC' and 'Z' for survey-like data on the sky, or 'X', 'Y', 'Z' for simulation boxes
@@ -38,13 +38,13 @@ tracer_file_type = 3  # 1 for FITS file, 2 for array in numpy pickle format (.np
 tracer_posn_cols = [0, 1, 2]  # columns of tracer input array containing 3D position information
 # specify data type:
 is_box = False       # True for cubic simulation box with periodic boundaries; False for survey-like data on the sky
-coord_conv = True   # True for converting coordinates from real to redshift
-planepar = False      # Whether to use plane parallel approximation for RSD 
+coord_conv = False   # True for converting coordinates from real to redshift
+planepar = True      # Whether to use plane parallel approximation for RSD 
 box_length = 2500.   # if is_box, the box side length in Mpc/h; else ignored
 # the following cuts useful for more efficient reconstruction and voxel void-finding for BOSS CMASS data, where a tiny
 # fraction of data extends to very high or very low redshifts (and even redshifts < 0)
-z_low_cut = 0.25      # lower redshift cut (ignored if not survey)
-z_high_cut = 0.75    # higher redshift cut (ignored if not survey)
+z_low_cut = 0        # lower redshift cut (ignored if not survey)
+z_high_cut = 2500    # higher redshift cut (ignored if not survey)
 # what is the model for applying weights? 1 = like BOSS; 2 = like eBOSS; 3 = like joint BOSS+eBOSS LRG sample
 # (unfortunately things change as surveys progress)
 weights_model = 1
@@ -57,7 +57,7 @@ weights_model = 1
 # present in the file using following flags (FKP, close-pair, missing redshift, total systematics, veto flag,
 # completeness). Weights MUST be given in consecutive columns starting immediately after the column with redshifts,
 # and with column numbers in the order fkp<cp<noz<systot<veto<comp
-fkp = True     # FKP weights (used for reconstruction when n(z) is not constant)
+fkp = False     # FKP weights (used for reconstruction when n(z) is not constant)
 cp = False      # close-pair or fibre collision weights
 noz = False     # missing redshift / redshift failure weights
 systot = False  # total systematic weights
@@ -68,7 +68,7 @@ comp = False    # sector completeness
 # ====== input randoms options ======= #
 # for survey-like data, randoms characterize the window function and MUST be provided for reconstruction and
 # voxel void-finding (not necessary for ZOBOV alone)
-random_file = 'revolver_test/Random-DR12CMASSLOWZTOT-N-V6C-x20-VT-FC.dat'   # /path/to/file containing randoms data
+random_file = 'revolver_test/box_uniform_random_seed1_0-2500.dat'   # /path/to/file containing randoms data
 random_file_type = 3  # 1 for FITS file, 2 for array in numpy pickle format (.npy), 3 for array in ASCII format
 # if random_file_type = 2 or 3, specify which columns of the array contain the (RA, Dec, redshift) coordinates
 random_posn_cols = [0, 1, 2]
@@ -82,8 +82,8 @@ run_zobov = False   # watershed void-finding (using ZOBOV) based on Voronoi tess
 # these two options are not mutually exclusive - 2 sets of voids can be produced if desired
 
 # for survey-like data only: set redshift limits
-z_min = 0.43        # minimum redshift extent of the data
-z_max = 0.70        # maximum redshift extent of the data
+z_min = 0           # minimum redshift extent of the data
+z_max = 2500        # maximum redshift extent of the data
 # these limits are used to prune output void catalogues and to terminate the tessellation in ZOBOV
 # NOTES: 1. always set z_min >= z_low_cut and z_max <= z_high_cut
 # 2. do not set z_min < minimum redshift of the data or z_max > max redshift – will cause tessellation leakage!
