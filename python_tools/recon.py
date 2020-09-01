@@ -17,7 +17,6 @@ class Recon:
         beta = parms.f / parms.bias
         self.is_box = parms.is_box
         self.verbose = parms.verbose
-        self.planepar = parms.planepar
 
         # -- parameters of box
         cosmo = Cosmology(omega_m=parms.omega_m)
@@ -255,7 +254,7 @@ class Recon:
         # now we update estimates of the Psi field in the following way:
         if iloop == 0:
             # starting estimate chosen according to Eq. 12 of Burden et al 2015, in order to improve convergence
-            if self.planepar:
+            if self.is_box:
                 # line-of-sight direction is along the z-axis (hard-coded)
                 psi_dot_rhat = shift_z
                 shift_z -= beta / (1 + beta) * psi_dot_rhat
@@ -266,7 +265,7 @@ class Recon:
                 shift_y -= beta / (1 + beta) * psi_dot_rhat * cat.y / cat.dist
                 shift_z -= beta / (1 + beta) * psi_dot_rhat * cat.z / cat.dist
         # given estimate of Psi, subtract approximate RSD to get estimate of real-space galaxy positions
-        if self.planepar:
+        if self.is_box:
             # line-of-sight direction is along the z-axis (hard-coded)
             cat.newz = cat.z + f * shift_z
             # check PBC
@@ -280,7 +279,7 @@ class Recon:
 
         # for debugging:
         if self.verbose and debug:
-            if self.planepar:
+            if self.is_box:
                 print('Debug: first 10 x,y,z shifts and old and new z positions')
                 for i in range(10):
                     print('%0.3f %0.3f %0.3f %0.3f %0.3f' % (shift_x[i], shift_y[i], shift_z[i], cat.z[i], cat.newz[i]))

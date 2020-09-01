@@ -125,8 +125,8 @@ class GalaxyCatalogue:
                 else:
                     # default is assumed to be ASCII file format
                     #data = np.loadtxt(input_file)
-                    data = pd.read_csv(input_file, delim_whitespace=True, engine='c').select_dtypes([np.number]).values
-                
+                    data = pd.read_csv(input_file, delim_whitespace=True, engine='c').values
+
                 # position information is ra, dec and redshift
                 self.ra = data[:, posn_cols[0]]
                 self.dec = data[:, posn_cols[1]]
@@ -210,25 +210,16 @@ class GalaxyCatalogue:
                 nside = hp.get_nside(completeness_mask)
                 pixels = hp.ang2pix(nside, np.deg2rad(90 - self.dec), np.deg2rad(self.ra))
                 self.comp = completeness_mask[pixels]
-            if parms.coord_conv:
-                # now initialize Cartesian positions and observer distance
-                cosmo = Cosmology(omega_m=parms.omega_m)
-                self.dist = cosmo.get_comoving_distance(self.redshift)
-                self.x = self.dist * np.cos(self.dec * np.pi / 180) * np.cos(self.ra * np.pi / 180)
-                self.y = self.dist * np.cos(self.dec * np.pi / 180) * np.sin(self.ra * np.pi / 180)
-                self.z = self.dist * np.sin(self.dec * np.pi / 180)
-                self.newx = self.x * 1.
-                self.newy = self.y * 1.
-                self.newz = self.z * 1.
-            else:
-                self.x = data[:, posn_cols[0]]
-                self.y = data[:, posn_cols[1]]
-                self.z = data[:, posn_cols[2]]
-                self.newx = 1.0 * self.x
-                self.newy = 1.0 * self.y
-                self.newz = 1.0 * self.z
-                self.size = self.x.size 
-                self.box_length = parms.box_length
+
+            # now initialize Cartesian positions and observer distance
+            cosmo = Cosmology(omega_m=parms.omega_m)
+            self.dist = cosmo.get_comoving_distance(self.redshift)
+            self.x = self.dist * np.cos(self.dec * np.pi / 180) * np.cos(self.ra * np.pi / 180)
+            self.y = self.dist * np.cos(self.dec * np.pi / 180) * np.sin(self.ra * np.pi / 180)
+            self.z = self.dist * np.sin(self.dec * np.pi / 180)
+            self.newx = self.x * 1.
+            self.newy = self.y * 1.
+            self.newz = self.z * 1.
 
     def cut(self, w):
         """Trim catalog columns using a boolean array"""
