@@ -363,6 +363,7 @@ class Recon:
         sy = cat.newy - cat.y
         sz = cat.newz - cat.z
         print('Shifts stats:')
+        print('std, 16%, 84%, min, max', flush=True)
         for s in [sx, sy, sz]:
             print(np.std(s), np.percentile(s, 16), np.percentile(s, 84), np.min(s), np.max(s))
 
@@ -427,7 +428,8 @@ class Recon:
             np.savetxt(out_file+".dat", output)
         else:
             # recalculate weights, as we don't want the FKP weighting for void-finding
-            self.cat.weight = self.cat.get_weights(fkp=False, syst_wts=True)
+            #self.cat.weight = self.cat.get_weights(fkp=False, syst_wts=True)
+            self.cat.ra, self.cat.dec, self.cat.redshift = self.cart_to_radecz(self.cat.newx, self.cat.newy, self.cat.newz)
             output = np.zeros((self.cat.size, 5))
             output[:, 0] = self.cat.ra
             output[:, 1] = self.cat.dec
@@ -443,13 +445,15 @@ class Recon:
             if not rsd_only:
                 # same as above, but for the randoms as well
                 output = np.zeros((self.ran.size, 4))
+                self.ran.ra, self.ran.dec, self.ran.redshift = self.cart_to_radecz(self.ran.newx, self.ran.newy, self.ran.newz)
                 output[:, 0] = self.ran.ra
                 output[:, 1] = self.ran.dec
                 output[:, 2] = self.ran.redshift
                 if self.ran.weights_model == 1:
-                    output[:, 3] = 1  # we don't include any systematics weights for the random catalogue
+                    output[:, 3] = self.ran.get_weights(fkp=True, syst_wts=True) #Put fkp true since there are the original weights
+                    #output[:, 3] = 1  # we don't include any systematics weights for the random catalogue
                 elif self.ran.weights_model == 2 or self.ran.weights_model == 3:
-                    output[:, 3] = self.ran.get_weights(fkp=False, syst_wts=True)
+                    output[:, 3] = self.ran.get_weights(fkp=True, syst_wts=True) #Put fkp true since there are the original weights
                 out_file = root2 + '_shift'
                 # t = Table(output, names=('RA', 'DEC', 'Z', 'WEIGHT_SYSTOT'))
                 # t.write(out_file, format='fits')

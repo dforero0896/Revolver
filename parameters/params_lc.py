@@ -9,7 +9,7 @@ nthreads = 32     # set to the number of CPUs available, more is better
 # ================================ #
 
 # ========= file handling options ========= #
-handle = 'Patchy-Mocks-DR12CMASSLOWZTOT-N-V6C-Portsmouth-mass_0001'  # string to identify the run; used to set filenames
+handle = 'Patchy-Mocks-DR12CMASSLOWZTOT-N-V6C-Portsmouth-mass_0595'  # string to identify the run; used to set filenames
 handle_ran = 'Random-DR12CMASSLOWZTOT-N-V6C-x20-VT-FC'
 output_folder = 'revolver_test/'   # /path/to/folder/ where output should be placed
 # ========================================= #
@@ -23,14 +23,14 @@ do_recon = True     # if False, no reconstruction is performed and other recon o
 nbins = 512     # the number of grid cells per side of the box
 padding = 200.  # for survey data, the extra 'padding' for the cubic box, in Mpc/h
 smooth = 15.    # smoothing scale in Mpc/h
-bias = 1.4        # the linear galaxy/tracer bias value
-f = 0.82        # the linear growth rate at the mean redshift
+bias = 2.2      # the linear galaxy/tracer bias value
+f = 0.757        # the linear growth rate at the mean redshift
 niter = 3       # number of iterations in the FFT reconstruction method, 3 is sufficient with z=0.5 f=0.754
 # NOTE: for box data, reconstruction assumes plane-parallel approximation with single l-o-s along the box z-axis!!
 # ========================================= #
 
 # ======= input galaxy/tracer data options =========== #
-tracer_file = 'revolver_test/Patchy-Mocks-DR12CMASSLOWZTOT-N-V6C-Portsmouth-mass_0001.dat'     # /path/to/file with input data
+tracer_file = 'revolver_test/Patchy-Mocks-DR12CMASSLOWZTOT-N-V6C-Portsmouth-mass_0595.dat'     # /path/to/file with input data
 tracer_file_type = 3  # 1 for FITS file, 2 for array in numpy pickle format (.npy), 3 for array in ASCII format
 # NOTE: for FITS files, the tracer coordinates should be specified using appropriate field names
 # current options are 'RA', 'DEC' and 'Z' for survey-like data on the sky, or 'X', 'Y', 'Z' for simulation boxes
@@ -41,11 +41,11 @@ is_box = False       # True for cubic simulation box with periodic boundaries; F
 box_length = 2500.   # if is_box, the box side length in Mpc/h; else ignored
 # the following cuts useful for more efficient reconstruction and voxel void-finding for BOSS CMASS data, where a tiny
 # fraction of data extends to very high or very low redshifts (and even redshifts < 0)
-z_low_cut = 0.25      # lower redshift cut (ignored if not survey)
+z_low_cut = 0.2      # lower redshift cut (ignored if not survey)
 z_high_cut = 0.75    # higher redshift cut (ignored if not survey)
 # what is the model for applying weights? 1 = like BOSS; 2 = like eBOSS; 3 = like joint BOSS+eBOSS LRG sample
 # (unfortunately things change as surveys progress)
-weights_model = 1
+weights_model = 2
 # 1. For FITS files (tracer_file_type = 1) weights are automatically extracted using field names based on BOSS/eBOSS data
 # model (https://data.sdss.org/datamodel/files/BOSS_LSS_REDUX/galaxy_DRX_SAMPLE_NS.html)
 # 2. for simulation box data (is_box = True) all weights information is ignored as assumed uniform
