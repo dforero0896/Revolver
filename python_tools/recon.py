@@ -8,8 +8,9 @@ from python_tools.cosmology import Cosmology
 import python_tools.fastmodules as fastmodules
 import pyfftw
 from astropy.table import Table
+#from python_tools.numba_modules import allocate_gal_cic_kernel
 
-
+#exit()
 class Recon:
 
     def __init__(self, cat, ran, parms):
@@ -37,6 +38,7 @@ class Recon:
         self.nthreads = parms.nthreads
         self.is_box = parms.is_box
 
+        
         # if dealing with data in a simulation box with PBC and uniform selection
         # the random data is not used and many of the processing steps are not required,
         # so check and proceed on this basis
@@ -182,6 +184,7 @@ class Recon:
                 fastmodules.mult_norm(rhok, rhok, norm)
                 ifft_obj(input_array=rhok, output_array=rho)
                 deltar = rho.real
+                
 
         else:
             delta = self.delta
@@ -204,6 +207,7 @@ class Recon:
         deltag = np.zeros((nbins, nbins, nbins), dtype='float64')
         fastmodules.allocate_gal_cic(deltag, cat.newx, cat.newy, cat.newz, cat.weight, cat.size, self.xmin, self.ymin,
                                      self.zmin, self.box, nbins, 1.)
+        
         if self.verbose:
             print('Smoothing galaxy density field ...')
         sys.stdout.flush()

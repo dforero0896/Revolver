@@ -79,14 +79,12 @@ if parms.do_recon:
 
     start = time.time()
     # now run the iteration loop to solve for displacement field
-    print(cat.ra)
-    print(recon.cat.ra)
+    
     for i in range(parms.niter):
         recon.iterate(i, debug=parms.debug)
 
     # get new ra, dec and redshift for real-space positions
-    print(cat.ra)
-    print(recon.cat.ra)
+    
     if not parms.is_box:
         cat.ra, cat.dec, cat.redshift = recon.get_new_radecz(recon.cat)
     
