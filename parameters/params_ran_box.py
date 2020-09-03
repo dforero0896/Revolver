@@ -37,9 +37,7 @@ tracer_file_type = 3  # 1 for FITS file, 2 for array in numpy pickle format (.np
 # For array data (tracer_file_type = 2 or 3), specify which columns of the array contain the tracer coordinates
 tracer_posn_cols = [0, 1, 2]  # columns of tracer input array containing 3D position information
 # specify data type:
-is_box = False       # True for cubic simulation box with periodic boundaries; False for survey-like data on the sky
-coord_conv = False   # True for converting coordinates from real to redshift
-planepar = True      # Whether to use plane parallel approximation for RSD 
+is_box = True       # True for cubic simulation box with periodic boundaries; False for survey-like data on the sky
 box_length = 2500.   # if is_box, the box side length in Mpc/h; else ignored
 # the following cuts useful for more efficient reconstruction and voxel void-finding for BOSS CMASS data, where a tiny
 # fraction of data extends to very high or very low redshifts (and even redshifts < 0)

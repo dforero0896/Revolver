@@ -44,6 +44,7 @@ class GalaxyCatalogue:
                 self.newz = 1.0 * self.z
                 self.size = self.x.size
                 self.weight = np.ones(self.x.size)  # uniform box so all weights are 1
+                
 
             else:
                 if input_file_type == 2:
@@ -51,7 +52,7 @@ class GalaxyCatalogue:
                     data = np.load(input_file)
                 else:
                     # default is assumed to be ASCII file format
-                    data = np.loadtxt(input_file)
+                    data = pd.read_csv(input_file, delim_whitespace=True, engine='c').select_dtypes([np.number]).values
 
                 self.x = data[:, posn_cols[0]]
                 self.y = data[:, posn_cols[1]]
@@ -63,6 +64,13 @@ class GalaxyCatalogue:
 
                 # set uniform weights for all tracers
                 self.weight = np.ones(self.size)
+            self.weight_fkp = np.ones(self.size)
+            self.weight_cp = np.ones(self.size)
+            self.weight_noz = np.ones(self.size)
+            self.weight_systot = np.ones(self.size)
+            self.comp = np.ones(self.size)
+            self.veto = np.ones(self.size)
+            self.weights_model = parms.weights_model
 
         else:  # dealing with survey-like data on the lightcone
 
@@ -125,7 +133,7 @@ class GalaxyCatalogue:
                 else:
                     # default is assumed to be ASCII file format
                     #data = np.loadtxt(input_file)
-                    data = pd.read_csv(input_file, delim_whitespace=True, engine='c').values
+                    data = pd.read_csv(input_file, delim_whitespace=True, engine='c').select_dtypes([np.number]).values
 
                 # position information is ra, dec and redshift
                 self.ra = data[:, posn_cols[0]]

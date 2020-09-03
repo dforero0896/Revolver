@@ -55,25 +55,26 @@ if parms.do_recon:
 
     cat = GalaxyCatalogue(parms, randoms=False)
 
-    if parms.is_box:
+    if parms.random_file == '':
         recon = Recon(cat, ran=None, parms=parms)
     else:
+        print("==> Found random filename, using randoms.")
         if not os.access(parms.random_file, os.F_OK):
             sys.exit('ERROR: randoms data required for reconstruction but randoms file not provided or not found!' +
                      'Aborting.')
 
         # initializing randoms
         ran = GalaxyCatalogue(parms, randoms=True)
-
-        # perform basic cuts on the data: vetomask and low redshift extent
-        wgal = np.empty(cat.size, dtype=int)
-        survey_cuts_logical(wgal, cat.veto, cat.redshift, parms.z_low_cut, parms.z_high_cut)
-        wgal = np.asarray(wgal, dtype=bool)
-        wran = np.empty(ran.size, dtype=int)
-        survey_cuts_logical(wran, ran.veto, ran.redshift, parms.z_low_cut, parms.z_high_cut)
-        wran = np.asarray(wran, dtype=bool)
-        cat.cut(wgal)
-        ran.cut(wran)
+        if not parms.is_box:
+            # perform basic cuts on the data: vetomask and low redshift extent if survey
+            wgal = np.empty(cat.size, dtype=int)
+            survey_cuts_logical(wgal, cat.veto, cat.redshift, parms.z_low_cut, parms.z_high_cut)
+            wgal = np.asarray(wgal, dtype=bool)
+            wran = np.empty(ran.size, dtype=int)
+            survey_cuts_logical(wran, ran.veto, ran.redshift, parms.z_low_cut, parms.z_high_cut)
+            wran = np.asarray(wran, dtype=bool)
+            cat.cut(wgal)
+            ran.cut(wran)
 
         recon = Recon(cat, ran, parms)
 

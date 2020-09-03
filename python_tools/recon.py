@@ -42,7 +42,8 @@ class Recon:
         # if dealing with data in a simulation box with PBC and uniform selection
         # the random data is not used and many of the processing steps are not required,
         # so check and proceed on this basis
-        if not self.is_box:
+        #if not self.is_box:
+        if ran is not None:
 
             # get the weights for data and randoms
             cat.weight = cat.get_weights(fkp=True, syst_wts=True)
@@ -165,7 +166,7 @@ class Recon:
             kr = fftfreq(nbins, d=binsize) * 2 * np.pi * self.smooth
             norm = np.exp(-0.5 * (kr[:, None, None] ** 2 + kr[None, :, None] ** 2 + kr[None, None, :] ** 2))
 
-            if self.is_box:
+            if ran is None:
                 deltar = 0
             else:
                 if self.verbose:
@@ -221,7 +222,7 @@ class Recon:
         if self.verbose:
             print('Computing density fluctuations, delta...')
         sys.stdout.flush()
-        if self.is_box:
+        if self.ran is None:
             # simply normalize based on (constant) mean galaxy number density
             fastmodules.normalize_delta_box(delta, deltag, cat.size)
         else:
@@ -347,6 +348,7 @@ class Recon:
 
         for c in [self.cat, self.ran]:
             if c is None: continue
+
             shift_x, shift_y, shift_z = \
                 self.get_shift(c, self.psi_x.real, self.psi_y.real, self.psi_z.real, use_newpos=True)
             c.newx += shift_x
@@ -430,6 +432,23 @@ class Recon:
             # t.write(out_file, format='fits')
             #np.save(out_file, output)
             np.savetxt(out_file+".dat", output)
+            if not rsd_only and self.ran is not None:
+                print("==> Saving shifted randoms.")
+                # same as above, but for the randoms as well
+                output = np.ones((self.ran.size, 4))
+                output[:, 0] = self.ran.newx
+                output[:, 1] = self.ran.newy
+                output[:, 2] = self.ran.newz
+                if self.ran.weights_model == 1:
+                    output[:, 3] = self.ran.get_weights(fkp=True, syst_wts=True) #Put fkp true since there are the original weights
+                    #output[:, 3] = 1  # we don't include any systematics weights for the random catalogue
+                elif self.ran.weights_model == 2 or self.ran.weights_model == 3:
+                    output[:, 3] = self.ran.get_weights(fkp=True, syst_wts=True) #Put fkp true since there are the original weights
+                out_file = root2 + '_shift'
+                # t = Table(output, names=('RA', 'DEC', 'Z', 'WEIGHT_SYSTOT'))
+                # t.write(out_file, format='fits')
+                #np.save(out_file, output)
+                np.savetxt(out_file+".dat", output)
         else:
             # recalculate weights, as we don't want the FKP weighting for void-finding
             #self.cat.weight = self.cat.get_weights(fkp=False, syst_wts=True)
@@ -447,6 +466,7 @@ class Recon:
             np.savetxt(out_file+".dat", output)
 
             if not rsd_only:
+                print("==> Saving shifted randoms.")
                 # same as above, but for the randoms as well
                 output = np.zeros((self.ran.size, 4))
                 self.ran.ra, self.ran.dec, self.ran.redshift = self.cart_to_radecz(self.ran.newx, self.ran.newy, self.ran.newz)
