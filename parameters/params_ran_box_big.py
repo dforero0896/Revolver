@@ -9,8 +9,8 @@ nthreads = 32     # set to the number of CPUs available, more is better
 # ================================ #
 
 # ========= file handling options ========= #
-handle = 'CATALPTCICz0.466G960S1005638091_zspace'  # string to identify the run; used to set filenames
-habdle_ran = ''
+handle = 'CATALPTCICz0.466G960S1005638091_zspace_wran_BIG'  # string to identify the run; used to set filenames
+handle_ran = 'box_uniform_random_seed2_0-2500_BIG'
 output_folder = 'tests/'   # /path/to/folder/ where output should be placed
 # ========================================= #
 
@@ -25,7 +25,7 @@ padding = 200.  # for survey data, the extra 'padding' for the cubic box, in Mpc
 smooth = 10.    # smoothing scale in Mpc/h
 bias = 1.92        # the linear galaxy/tracer bias value
 f = 0.743         # the linear growth rate at the mean redshift
-niter = 3       # number of iterations in the FFT reconstruction method, 3 is sufficient
+niter = 3       # number of iterations in the FFT reconstruction method, 3 is sufficient with z=0.5 f=0.754
 # NOTE: for box data, reconstruction assumes plane-parallel approximation with single l-o-s along the box z-axis!!
 # ========================================= #
 
@@ -41,11 +41,11 @@ is_box = True       # True for cubic simulation box with periodic boundaries; Fa
 box_length = 2500.   # if is_box, the box side length in Mpc/h; else ignored
 # the following cuts useful for more efficient reconstruction and voxel void-finding for BOSS CMASS data, where a tiny
 # fraction of data extends to very high or very low redshifts (and even redshifts < 0)
-z_low_cut = 0.4      # lower redshift cut (ignored if not survey)
-z_high_cut = 0.73    # higher redshift cut (ignored if not survey)
+z_low_cut = 0        # lower redshift cut (ignored if not survey)
+z_high_cut = 2500    # higher redshift cut (ignored if not survey)
 # what is the model for applying weights? 1 = like BOSS; 2 = like eBOSS; 3 = like joint BOSS+eBOSS LRG sample
 # (unfortunately things change as surveys progress)
-weights_model = 2
+weights_model = 1
 # 1. For FITS files (tracer_file_type = 1) weights are automatically extracted using field names based on BOSS/eBOSS data
 # model (https://data.sdss.org/datamodel/files/BOSS_LSS_REDUX/galaxy_DRX_SAMPLE_NS.html)
 # 2. for simulation box data (is_box = True) all weights information is ignored as assumed uniform
@@ -66,8 +66,9 @@ comp = False    # sector completeness
 # ====== input randoms options ======= #
 # for survey-like data, randoms characterize the window function and MUST be provided for reconstruction and
 # voxel void-finding (not necessary for ZOBOV alone)
-random_file = ''   # /path/to/file containing randoms data
-random_file_type = 1  # 1 for FITS file, 2 for array in numpy pickle format (.npy), 3 for array in ASCII format
+#random_file = 'revolver_test/box_uniform_random_seed1_0-2500.dat'   # /path/to/file containing randoms data
+random_file = 'tests/box_uniform_random_seed2_0-2500_BIG.dat'   # /pathl/to/file containing randoms data
+random_file_type = 3  # 1 for FITS file, 2 for array in numpy pickle format (.npy), 3 for array in ASCII format
 # if random_file_type = 2 or 3, specify which columns of the array contain the (RA, Dec, redshift) coordinates
 random_posn_cols = [0, 1, 2]
 # if galaxy data has FKP weights, randoms are assumed to have FKP weights too
@@ -80,8 +81,8 @@ run_zobov = False   # watershed void-finding (using ZOBOV) based on Voronoi tess
 # these two options are not mutually exclusive - 2 sets of voids can be produced if desired
 
 # for survey-like data only: set redshift limits
-z_min = 0.43        # minimum redshift extent of the data
-z_max = 0.70        # maximum redshift extent of the data
+z_min = 0           # minimum redshift extent of the data
+z_max = 2500        # maximum redshift extent of the data
 # these limits are used to prune output void catalogues and to terminate the tessellation in ZOBOV
 # NOTES: 1. always set z_min >= z_low_cut and z_max <= z_high_cut
 # 2. do not set z_min < minimum redshift of the data or z_max > max redshift – will cause tessellation leakage!

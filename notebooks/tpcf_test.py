@@ -33,8 +33,8 @@ def two_point_box(data, bins, box_size):
     return corr, DD, RR
 
 def main_fcfc_box():
-    pre_recon = "revolver_test/CATALPTCICz0.466G960S1005638091_zspace.dat"
-    post_recon = "revolver_test/CATALPTCICz0.466G960S1005638091_zspace_pos_shift.dat"
+    pre_recon = "tests/CATALPTCICz0.466G960S1005638091_zspace.dat"
+    post_recon = "tests/CATALPTCICz0.466G960S1005638091_zspace_pos_shift.dat"
     pre_recon_fn = [os.path.splitext(pre_recon)[0]+"."+s for s in ['dd', 'dr', 'rr', '2pcf']]
     post_recon_fn = [os.path.splitext(post_recon)[0]+"."+s for s in ['dd', 'dr', 'rr', '2pcf']]
     #subprocess.check_call(["bin/2pcf_box", "--conf=notebooks/fcfc.conf", f"--data={pre_recon}", f"--dd={pre_recon_fn[0]}", f"--dr={pre_recon_fn[1]}", f"--rr={pre_recon_fn[2]}", f"--output={pre_recon_fn[3]}"])
@@ -49,14 +49,14 @@ def main_fcfc_box():
     plt.gcf()
     plt.savefig("notebooks/before_after_test.png")
 def main_fcfc_lc():
-    pre_recon = "revolver_test/Patchy-Mocks-DR12CMASSLOWZTOT-N-V6C-Portsmouth-mass_0595.dat"
-    post_recon = "revolver_test/Patchy-Mocks-DR12CMASSLOWZTOT-N-V6C-Portsmouth-mass_0595_pos_shift.dat"
-    post_recon_used =  "revolver_test/Patchy-Mocks-DR12CMASSLOWZTOT-N-V6C-Portsmouth-mass_0595.xyzwzi.recon"
-    pre_recon_ran = "revolver_test/Random-DR12CMASSLOWZTOT-N-V6C-x20-VT-FC.dat"
-    post_recon_ran = "revolver_test/Random-DR12CMASSLOWZTOT-N-V6C-x20-VT-FC_pos_shift.dat"
-    post_recon_used_ran = "revolver_test/Random-DR12CMASSLOWZTOT-N-V6C-x20_0595.xyzwzi.recon"
-    #post_recon_prev = "revolver_test/GCF-Patchy-Mocks-DR12CMASSLOWZTOT-N-V6C-Portsmouth-mass_0595.2pcf" #These two do not coincide (should they?)
-    post_recon_prev = "revolver_test/2PCF/2PCF_Patchy-Mocks-DR12CMASSLOWZTOT-N-V6C-Portsmouth-mass_0595_recon_z0.2z0.5.2pcf"
+    pre_recon = "tests/Patchy-Mocks-DR12CMASSLOWZTOT-N-V6C-Portsmouth-mass_0595.dat"
+    post_recon = "tests/Patchy-Mocks-DR12CMASSLOWZTOT-N-V6C-Portsmouth-mass_0595_pos_shift.dat"
+    post_recon_used =  "tests/Patchy-Mocks-DR12CMASSLOWZTOT-N-V6C-Portsmouth-mass_0595.xyzwzi.recon"
+    pre_recon_ran = "tests/Random-DR12CMASSLOWZTOT-N-V6C-x20-VT-FC.dat"
+    post_recon_ran = "tests/Random-DR12CMASSLOWZTOT-N-V6C-x20-VT-FC_pos_shift.dat"
+    post_recon_used_ran = "tests/Random-DR12CMASSLOWZTOT-N-V6C-x20_0595.xyzwzi.recon"
+    #post_recon_prev = "tests/GCF-Patchy-Mocks-DR12CMASSLOWZTOT-N-V6C-Portsmouth-mass_0595.2pcf" #These two do not coincide (should they?)
+    post_recon_prev = "tests/2PCF/2PCF_Patchy-Mocks-DR12CMASSLOWZTOT-N-V6C-Portsmouth-mass_0595_recon_z0.2z0.5.2pcf"
     pre_recon_fn = [os.path.splitext(pre_recon)[0]+"."+s for s in ['dd', 'dr', 'rr', '2pcf']]
     post_recon_fn = [os.path.splitext(post_recon)[0]+"."+s for s in ['dd', 'ds', 'ss', '2pcf']]
     post_recon_used_fn = [os.path.splitext(post_recon_used)[0]+"."+s for s in ['dd', 'ds', 'ss', '2pcf']]
@@ -84,29 +84,65 @@ def main_fcfc_lc():
     plt.gcf()
     plt.savefig("notebooks/before_after_test_lc.png")
 def main_fcfc_ran_box():
-    pre_recon = "revolver_test/CATALPTCICz0.466G960S1005638091_zspace.dat"
-    post_recon = "revolver_test/CATALPTCICz0.466G960S1005638091_zspace_wran_pos_shift.dat"
-    post_recon_noran = "revolver_test/CATALPTCICz0.466G960S1005638091_zspace_pos_shift.dat"
-    pre_recon_ran = "revolver_test/box_uniform_random_seed1_0-2500.dat"
-    post_recon_ran = "revolver_test/box_uniform_random_seed1_0-2500_pos_shift.dat"
+    #Data
+    pre_recon = "tests/CATALPTCICz0.466G960S1005638091_zspace.dat"
+    post_recon = "tests/CATALPTCICz0.466G960S1005638091_zspace_wran_pos_shift.dat"
+    post_recon_big = "tests/CATALPTCICz0.466G960S1005638091_zspace_wran_BIG_pos_shift.dat"
+    post_recon_nopad = "tests/CATALPTCICz0.466G960S1005638091_zspace_wran_nopad_pos_shift.dat"
+    post_recon_noran = "tests/CATALPTCICz0.466G960S1005638091_zspace_pos_shift.dat"
+    
+
+    # Shifted randoms
+    pre_recon_ran = "tests/box_uniform_random_seed1_0-2500.dat"
+    post_recon_ran = "tests/box_uniform_random_seed1_0-2500_pos_shift.dat"
+    post_recon_ran_nopad = "tests/box_uniform_random_seed1_0-2500_nopad_pos_shift.dat"
+    post_recon_ran_big = "tests/box_uniform_random_seed2_0-2500_BIG_pos_shift.dat"
+
+    # Filenames
     pre_recon_fn = [os.path.splitext(pre_recon)[0]+"."+s for s in ['dd', 'dr', 'rr', '2pcf']]
     post_recon_fn = [os.path.splitext(post_recon)[0]+"."+s for s in ['dd', 'ds', 'ss', '2pcf']]
+    post_recon_big_fn = [os.path.splitext(post_recon_big)[0]+"."+s for s in ['dd', 'ds', 'ss', '2pcf']]
+    post_recon_nopad_fn = [os.path.splitext(post_recon_nopad)[0]+"."+s for s in ['dd', 'ds', 'ss', '2pcf']]
     post_recon_noran_fn = [os.path.splitext(post_recon_noran)[0]+"."+s for s in ['dd', 'dr', 'rr', '2pcf']]
+
+    # Pre recon 2pcf
     if not os.path.isfile(pre_recon_fn[-1]):
+        print("Computing pre recon 2pcf")
         subprocess.check_call(["bin/2pcf_box", "--conf=notebooks/fcfc.conf", f"--data={pre_recon}", f"--rand={pre_recon_ran}", f"--dd={pre_recon_fn[0]}", f"--dr={pre_recon_fn[1]}", f"--rr={pre_recon_fn[2]}", f"--output={pre_recon_fn[3]}", f"--count-mode=7"])
+    # Post recon 2pcf small rand
+    if not os.path.isfile(post_recon_fn[-1]):
+        print("Computing post recon 2pcf small rand")
+        subprocess.check_call(["srun", "-p", "p5", "-n1", "-c32", "bin/2pcf_box", "--conf=notebooks/fcfc.conf", f"--data={post_recon}", f"--rand={post_recon_ran}", f"--dd={post_recon_fn[0]}", f"--dr={post_recon_fn[1]}", f"--rr={post_recon_fn[2]}", f"--output={post_recon_fn[3]}", f"--count-mode=7", f"--cf-mode=1"])
+    # Post recon 2pcf small rand nopad
+    if not os.path.isfile(post_recon_nopad_fn[-1]):
+        print("Computing post recon 2pcf small rand nopad")
+        subprocess.check_call(["srun", "-p", "p5", "-n1", "-c32", "bin/2pcf_box", "--conf=notebooks/fcfc.conf", f"--data={post_recon_nopad}", f"--rand={post_recon_ran_nopad}", f"--dd={post_recon_nopad_fn[0]}", f"--dr={post_recon_nopad_fn[1]}", f"--rr={post_recon_nopad_fn[2]}", f"--output={post_recon_nopad_fn[3]}", f"--count-mode=7", f"--cf-mode=1"])
+    # Post recon 2pcf big rand
+    if not os.path.isfile(post_recon_big_fn[-1]):
+        print("Computing post recon 2pcf big rand")
+        subprocess.check_call(["srun", "-p", "p5", "-n1", "-c32", "bin/2pcf_box", "--conf=notebooks/fcfc.conf", f"--data={post_recon_big}", f"--rand={post_recon_ran_big}", f"--dd={post_recon_big_fn[0]}", f"--dr={post_recon_big_fn[1]}", f"--rr={post_recon_big_fn[2]}", f"--output={post_recon_big_fn[3]}", f"--count-mode=7", f"--cf-mode=1"])
     
-    #if True:#not os.path.isfile(post_recon_fn[-1]):
-    #    subprocess.check_call(["srun", "-p", "p5", "-n1", "-c32", "bin/2pcf_box", "--conf=notebooks/fcfc.conf", f"--data={post_recon}", f"--rand={post_recon_ran}", f"--dd={post_recon_fn[0]}", f"--dr={post_recon_fn[1]}", f"--rr={post_recon_fn[2]}", f"--output={post_recon_fn[3]}", f"--count-mode=7", f"--cf-mode=1"])
+    # Read computed 2pcfs
     pre_2pcf = pd.read_csv(pre_recon_fn[3], delim_whitespace=True, engine='c', names = ['s', 'mono', 'quad', 'hexa'])
     post_2pcf = pd.read_csv(post_recon_fn[3], delim_whitespace=True, engine='c', names = ['s', 'mono', 'quad', 'hexa'])
+    post_big_2pcf = pd.read_csv(post_recon_big_fn[3], delim_whitespace=True, engine='c', names = ['s', 'mono', 'quad', 'hexa'])
+    post_nopad_2pcf = pd.read_csv(post_recon_nopad_fn[3], delim_whitespace=True, engine='c', names = ['s', 'mono', 'quad', 'hexa'])
     post_noran_2pcf = pd.read_csv(post_recon_noran_fn[3], delim_whitespace=True, engine='c', names = ['s', 'mono', 'quad', 'hexa'])
+
+    # Plot 2pcfs
     fig, ax = plt.subplots(1,2, figsize=(20,10))
     ax[0].plot(pre_2pcf['s'], pre_2pcf['s']**2*pre_2pcf['mono'], label='Pre')
-    ax[0].plot(post_2pcf['s'], post_2pcf['s']**2*post_2pcf['mono'], label='Post ran')
+    ax[0].plot(post_2pcf['s'], post_2pcf['s']**2*post_2pcf['mono'], label='Post ran small')
+    ax[0].plot(post_nopad_2pcf['s'], post_nopad_2pcf['s']**2*post_nopad_2pcf['mono'], label='Post ran big')
+    ax[0].plot(post_big_2pcf['s'], post_big_2pcf['s']**2*post_big_2pcf['mono'], label='Post ran big')
     ax[0].plot(post_noran_2pcf['s'], post_noran_2pcf['s']**2*post_noran_2pcf['mono'], label='Post no ran')
+
     ax[1].plot(pre_2pcf['s'], pre_2pcf['s']**2*pre_2pcf['quad'])
     ax[1].plot(post_2pcf['s'], post_2pcf['s']**2*post_2pcf['quad'])
+    ax[1].plot(post_nopad_2pcf['s'], post_nopad_2pcf['s']**2*post_nopad_2pcf['quad'])
+    ax[1].plot(post_big_2pcf['s'], post_big_2pcf['s']**2*post_big_2pcf['quad'])
     ax[1].plot(post_noran_2pcf['s'], post_noran_2pcf['s']**2*post_noran_2pcf['quad'])
+    
     ax[0].legend(loc=0)
     plt.gcf()
     plt.savefig("notebooks/before_after_test_ran_box.png")
@@ -124,8 +160,8 @@ def get_multipoles(results, bins, nmu_bins, RR):
     xi4 = np.trapz(hexa, dx=1./nmu_bins, axis=0)
     return s[:,0], xi0, xi2, xi4
 def main_corrfunc():
-    pre_recon_fn = "revolver_test/CATALPTCICz0.466G960S1005638091_zspace.dat"
-    post_recon_fn = "revolver_test/CATALPTCICz0.466G960S1005638091_zspace_pos_shift.dat"
+    pre_recon_fn = "tests/CATALPTCICz0.466G960S1005638091_zspace.dat"
+    post_recon_fn = "tests/CATALPTCICz0.466G960S1005638091_zspace_pos_shift.dat"
     print("Importing prerecon dataset", flush=True)
     pre_recon = pd.read_csv(pre_recon_fn, delim_whitespace=True, engine='c', names = ['x', 'y', 'z'], usecols=[0,1,2]).values
     print("Importing postrecon dataset", flush=True)
@@ -170,8 +206,8 @@ def main_corrfunc():
     plt.savefig("notebooks/before_after_test_corrfunc.png")
 
 def main_astroml():
-    pre_recon_fn = "revolver_test/CATALPTCICz0.466G960S1005638091_zspace.dat"
-    post_recon_fn = "revolver_test/CATALPTCICz0.466G960S1005638091_zspace_pos_shift.dat"
+    pre_recon_fn = "tests/CATALPTCICz0.466G960S1005638091_zspace.dat"
+    post_recon_fn = "tests/CATALPTCICz0.466G960S1005638091_zspace_pos_shift.dat"
     print("Importing prerecon dataset", flush=True)
     pre_recon = pd.read_csv(pre_recon_fn, delim_whitespace=True, engine='c', names = ['x', 'y', 'z'], usecols=[0,1,2]).values
     print(f"Prerecon shape: {pre_recon.shape}")
