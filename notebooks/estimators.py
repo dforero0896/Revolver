@@ -71,5 +71,5 @@ plot_2pcf(compute_2pcf('tests/CATALPTCICz0.466G960S1005638091_zspace_wran_nopad_
 
 #plot_2pcf(compute_2pcf('tests/CATALPTCICz0.466G960S1005638091_zspace_wran_pos_shift', 'ls', 'rr', use_rr=True), ax, label='Ran only rranalyt ls', ls='--', lw=3)
 #plot_2pcf(compute_2pcf('tests/CATALPTCICz0.466G960S1005638091_zspace_wran_pos_shift', 'natural', 'rr', use_rr=True), ax, label='Ran only rranalyt natural', ls='--', lw=3)
-ax[0].legend()
+ax[0]d.legend()
 fig.savefig('notebooks/estimators.png', dpi=200)
