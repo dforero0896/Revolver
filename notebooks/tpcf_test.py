@@ -133,7 +133,7 @@ def main_fcfc_ran_box():
     fig, ax = plt.subplots(1,2, figsize=(20,10))
     ax[0].plot(pre_2pcf['s'], pre_2pcf['s']**2*pre_2pcf['mono'], label='Pre')
     ax[0].plot(post_2pcf['s'], post_2pcf['s']**2*post_2pcf['mono'], label='Post ran small')
-    ax[0].plot(post_nopad_2pcf['s'], post_nopad_2pcf['s']**2*post_nopad_2pcf['mono'], label='Post ran big')
+    ax[0].plot(post_nopad_2pcf['s'], post_nopad_2pcf['s']**2*post_nopad_2pcf['mono'], label='Post nopad ran small')
     ax[0].plot(post_big_2pcf['s'], post_big_2pcf['s']**2*post_big_2pcf['mono'], label='Post ran big')
     ax[0].plot(post_noran_2pcf['s'], post_noran_2pcf['s']**2*post_noran_2pcf['mono'], label='Post no ran')
 
