@@ -80,9 +80,11 @@ if parms.do_recon:
 
     start = time.time()
     # now run the iteration loop to solve for displacement field
-    
+    if not parms.rsd_corr:
+        print("==> RSD correction is %s, forcing niter=1."%parms.rsd_corr)
+        parms.niter=1
     for i in range(parms.niter):
-        recon.iterate(i, debug=parms.debug)
+        recon.iterate(i, rsd_corr=parms.rsd_corr, debug=parms.debug)
 
     # get new ra, dec and redshift for real-space positions
     

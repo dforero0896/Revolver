@@ -125,7 +125,7 @@ class Recon:
 
         return xmin, ymin, zmin, box, binsize
 
-    def iterate(self, iloop, save_wisdom=1, debug=False):
+    def iterate(self, iloop, rsd_corr=True, save_wisdom=1, debug=False):
 
         cat = self.cat
         ran = self.ran
@@ -224,7 +224,7 @@ class Recon:
         sys.stdout.flush()
         if self.ran is None:
             # simply normalize based on (constant) mean galaxy number density
-            fastmodules.normalize_delta_box(delta, deltag, cat.size)
+            fastmodules.normalize_delta_box(delta, deltag, cat.size) #Apparently buggy TODO
         else:
             # normalize using the randoms, avoiding possible divide-by-zero errors
             fastmodules.normalize_delta_survey(delta, deltag, deltar, self.alpha, self.ran_min)
@@ -255,32 +255,34 @@ class Recon:
             print('Calculating shifts...')
         sys.stdout.flush()
         shift_x, shift_y, shift_z = self.get_shift(cat, psi_x.real, psi_y.real, psi_z.real, use_newpos=True)
+        # Up to here the displacement field is correct for real space catalogs.
 
         # now we update estimates of the Psi field in the following way:
-        if iloop == 0:
-            # starting estimate chosen according to Eq. 12 of Burden et al 2015, in order to improve convergence
+        if rsd_corr:
+            if iloop == 0:
+                # starting estimate chosen according to Eq. 12 of Burden et al 2015, in order to improve convergence
+                if self.is_box:
+                    # line-of-sight direction is along the z-axis (hard-coded)
+                    psi_dot_rhat = shift_z
+                    shift_z -= beta / (1 + beta) * psi_dot_rhat
+                else:
+                    # line-of-sight direction determined by galaxy coordinates
+                    psi_dot_rhat = (shift_x * cat.x + shift_y * cat.y + shift_z * cat.z) / cat.dist
+                    shift_x -= beta / (1 + beta) * psi_dot_rhat * cat.x / cat.dist
+                    shift_y -= beta / (1 + beta) * psi_dot_rhat * cat.y / cat.dist
+                    shift_z -= beta / (1 + beta) * psi_dot_rhat * cat.z / cat.dist
+            # given estimate of Psi, subtract approximate RSD to get estimate of real-space galaxy positions
             if self.is_box:
                 # line-of-sight direction is along the z-axis (hard-coded)
-                psi_dot_rhat = shift_z
-                shift_z -= beta / (1 + beta) * psi_dot_rhat
+                cat.newz = cat.z + f * shift_z
+                # check PBC
+                cat.newz[cat.newz >= cat.box_length] -= cat.box_length
+                cat.newz[cat.newz < 0] += cat.box_length
             else:
-                # line-of-sight direction determined by galaxy coordinates
                 psi_dot_rhat = (shift_x * cat.x + shift_y * cat.y + shift_z * cat.z) / cat.dist
-                shift_x -= beta / (1 + beta) * psi_dot_rhat * cat.x / cat.dist
-                shift_y -= beta / (1 + beta) * psi_dot_rhat * cat.y / cat.dist
-                shift_z -= beta / (1 + beta) * psi_dot_rhat * cat.z / cat.dist
-        # given estimate of Psi, subtract approximate RSD to get estimate of real-space galaxy positions
-        if self.is_box:
-            # line-of-sight direction is along the z-axis (hard-coded)
-            cat.newz = cat.z + f * shift_z
-            # check PBC
-            cat.newz[cat.newz >= cat.box_length] -= cat.box_length
-            cat.newz[cat.newz < 0] += cat.box_length
-        else:
-            psi_dot_rhat = (shift_x * cat.x + shift_y * cat.y + shift_z * cat.z) / cat.dist
-            cat.newx = cat.x + f * psi_dot_rhat * cat.x / cat.dist
-            cat.newy = cat.y + f * psi_dot_rhat * cat.y / cat.dist
-            cat.newz = cat.z + f * psi_dot_rhat * cat.z / cat.dist
+                cat.newx = cat.x + f * psi_dot_rhat * cat.x / cat.dist
+                cat.newy = cat.y + f * psi_dot_rhat * cat.y / cat.dist
+                cat.newz = cat.z + f * psi_dot_rhat * cat.z / cat.dist
 
         # for debugging:
         if self.verbose and debug:
@@ -431,7 +433,7 @@ class Recon:
             # t = Table(output, names=('X', 'Y', 'Z'))
             # t.write(out_file, format='fits')
             #np.save(out_file, output)
-            np.savetxt(out_file+".dat", output)
+            np.savetxt(out_file+".dat", output, fmt='%.4f')
             if not rsd_only and self.ran is not None:
                 print("==> Saving shifted randoms.")
                 # same as above, but for the randoms as well
@@ -448,7 +450,7 @@ class Recon:
                 # t = Table(output, names=('RA', 'DEC', 'Z', 'WEIGHT_SYSTOT'))
                 # t.write(out_file, format='fits')
                 #np.save(out_file, output)
-                np.savetxt(out_file+".dat", output)
+                np.savetxt(out_file+".dat", output, fmt='%.4f')
         else:
             # recalculate weights, as we don't want the FKP weighting for void-finding
             #self.cat.weight = self.cat.get_weights(fkp=False, syst_wts=True)
