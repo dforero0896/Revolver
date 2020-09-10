@@ -7,6 +7,10 @@ ext_modules=[ Extension("fastmodules",
               ["python_tools/fastmodules.pyx"],
               libraries=["m"],
               extra_compile_args = ["-ffast-math"],
+              include_dirs=[numpy.get_include()]), Extension("fastmodules_par",
+              ["python_tools/fastmodules_par.pyx"],
+              libraries=["m"],
+              extra_compile_args = ["-ffast-math"],
               include_dirs=[numpy.get_include()])]
 
 setup(

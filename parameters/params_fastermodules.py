@@ -9,8 +9,8 @@ nthreads = 32     # set to the number of CPUs available, more is better
 # ================================ #
 
 # ========= file handling options ========= #
-handle = 'CATALPTCICz0.466G960S1005638091_zspace_wran_BIG'  # string to identify the run; used to set filenames
-handle_ran = 'box_uniform_random_seed2_0-2500_BIG'
+handle = 'CATALPTCICz0.466G960S1005638091_zspace_fastermodules'  # string to identify the run; used to set filenames
+handle_ran = 'box_uniform_random_seed1_0-2500_fastermodules'
 output_folder = 'tests/'   # /path/to/folder/ where output should be placed
 # ========================================= #
 
@@ -21,7 +21,7 @@ omega_m = 0.307115  # used for reconstruction and to convert redshifts to distan
 # ======= reconstruction options ========== #
 do_recon = True     # if False, no reconstruction is performed and other recon options are ignored
 nbins = 512     # the number of grid cells per side of the box
-padding = 200.  # for survey data, the extra 'padding' for the cubic box, in Mpc/h
+padding = 0.  # for survey data, the extra 'padding' for the cubic box, in Mpc/h
 smooth = 10.    # smoothing scale in Mpc/h
 bias = 1.92        # the linear galaxy/tracer bias value
 f = 0.743         # the linear growth rate at the mean redshift
@@ -67,8 +67,7 @@ comp = False    # sector completeness
 # ====== input randoms options ======= #
 # for survey-like data, randoms characterize the window function and MUST be provided for reconstruction and
 # voxel void-finding (not necessary for ZOBOV alone)
-#random_file = 'revolver_test/box_uniform_random_seed1_0-2500.dat'   # /path/to/file containing randoms data
-random_file = 'tests/box_uniform_random_seed2_0-2500_BIG.dat'   # /pathl/to/file containing randoms data
+random_file = 'tests/box_uniform_random_seed1_0-2500.dat'   # /path/to/file containing randoms data
 random_file_type = 3  # 1 for FITS file, 2 for array in numpy pickle format (.npy), 3 for array in ASCII format
 # if random_file_type = 2 or 3, specify which columns of the array contain the (RA, Dec, redshift) coordinates
 random_posn_cols = [0, 1, 2]

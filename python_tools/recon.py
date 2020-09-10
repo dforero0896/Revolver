@@ -5,7 +5,8 @@ import json
 import sys
 from scipy.fftpack import fftfreq
 from python_tools.cosmology import Cosmology
-import python_tools.fastmodules as fastmodules
+import python_tools.fastmodules_par as fastmodules
+#import python_tools.fastmodules as fastmodules
 import pyfftw
 from astropy.table import Table
 #from python_tools.numba_modules import allocate_gal_cic_kernel
@@ -373,7 +374,7 @@ class Recon:
         print('Shifts stats:')
         print('std, 16%, 84%, min, max', flush=True)
         for s in [sx, sy, sz]:
-            print(np.std(s), np.percentile(s, 16), np.percentile(s, 84), np.min(s), np.max(s))
+            print(np.std(s), np.percentile(s, 16), np.percentile(s, 84), np.min(s), np.max(s), flush=True)
 
     def get_shift(self, c, f_x, f_y, f_z, use_newpos=False):
         """Given grid of f_x, f_y and f_z values, uses interpolation scheme to compute
@@ -435,7 +436,7 @@ class Recon:
             #np.save(out_file, output)
             np.savetxt(out_file+".dat", output, fmt='%.4f')
             if not rsd_only and self.ran is not None:
-                print("==> Saving shifted randoms.")
+                print("==> Saving shifted randoms.", flush=True)
                 # same as above, but for the randoms as well
                 output = np.ones((self.ran.size, 4))
                 output[:, 0] = self.ran.newx

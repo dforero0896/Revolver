@@ -25,6 +25,7 @@ padding = 200.  # for survey data, the extra 'padding' for the cubic box, in Mpc
 smooth = 10.    # smoothing scale in Mpc/h
 bias = 1.92        # the linear galaxy/tracer bias value
 f = 0.743         # the linear growth rate at the mean redshift
+rsd_corr = True # if False, no RSD correction is performed and niter should be 1. Use when supplying real-space catalogs.
 niter = 3       # number of iterations in the FFT reconstruction method, 3 is sufficient with z=0.5 f=0.754
 # NOTE: for box data, reconstruction assumes plane-parallel approximation with single l-o-s along the box z-axis!!
 # ========================================= #
