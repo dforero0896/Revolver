@@ -35,10 +35,11 @@ def two_point_box(data, bins, box_size):
 def main_fcfc_box():
     pre_recon = "tests/CATALPTCICz0.466G960S1005638091_zspace.dat"
     post_recon = "tests/CATALPTCICz0.466G960S1005638091_zspace_pos_shift.dat"
+    post_recon_ran = "tests/CATALPTCICz0.466G960S1005638091_zspace_pos.ran_shift.dat"
     pre_recon_fn = [os.path.splitext(pre_recon)[0]+"."+s for s in ['dd', 'dr', 'rr', '2pcf']]
-    post_recon_fn = [os.path.splitext(post_recon)[0]+"."+s for s in ['dd', 'dr', 'rr', '2pcf']]
+    post_recon_fn = [os.path.splitext(post_recon)[0]+"."+s for s in ['dd', 'ds', 'ss', '2pcf']]
     #subprocess.check_call(["bin/2pcf_box", "--conf=notebooks/fcfc.conf", f"--data={pre_recon}", f"--dd={pre_recon_fn[0]}", f"--dr={pre_recon_fn[1]}", f"--rr={pre_recon_fn[2]}", f"--output={pre_recon_fn[3]}"])
-    subprocess.check_call(["srun", "-p", "p5", "-n1", "-c32", "bin/2pcf_box", "--conf=notebooks/fcfc.conf", f"--data={post_recon}", f"--dd={post_recon_fn[0]}", f"--dr={post_recon_fn[1]}", f"--rr={post_recon_fn[2]}", f"--output={post_recon_fn[3]}"])
+    subprocess.check_call(["srun", "-p", "p5", "-n1", "-c32", "bin/2pcf_box", "--conf=notebooks/fcfc.conf", f"--data={post_recon}", f"--rand={post_recon_ran}", f"--dd={post_recon_fn[0]}", f"--dr={post_recon_fn[1]}", f"--rr={post_recon_fn[2]}", f"--output={post_recon_fn[3]}", "--count-mode=7", "--cf-mode=1"])
     pre_2pcf = pd.read_csv(pre_recon_fn[3], delim_whitespace=True, engine='c', names = ['s', 'mono', 'quad', 'hexa'])
     post_2pcf = pd.read_csv(post_recon_fn[3], delim_whitespace=True, engine='c', names = ['s', 'mono', 'quad', 'hexa'])
     fig, ax = plt.subplots(1,2, figsize=(20,10))
@@ -291,6 +292,6 @@ def main_astroml():
 
 if __name__ == '__main__':
     #main_corrfunc()
-    #main_fcfc_box()
+    main_fcfc_box()
     #main_fcfc_lc()
-    main_fcfc_ran_box()
+    #main_fcfc_ran_box()

@@ -422,6 +422,48 @@ class Recon:
 
         return shift_x, shift_y, shift_z
 
+    def get_shift_array(self, x_arr, y_arr, z_arr, f_x, f_y, f_z):
+        """Given grid of f_x, f_y and f_z values, uses interpolation scheme to compute
+        appropriate values at the galaxy positions"""
+
+        xmin = self.xmin
+        ymin = self.ymin
+        zmin = self.zmin
+        binsize = self.binsize
+
+        xpos = (x_arr - xmin) / binsize
+        ypos = (y_arr - ymin) / binsize
+        zpos = (z_arr - zmin) / binsize
+        
+
+        i = xpos.astype(int)
+        j = ypos.astype(int)
+        k = zpos.astype(int)
+
+        ddx = xpos - i
+        ddy = ypos - j
+        ddz = zpos - k
+
+        shift_x = np.zeros(x_arr.shape[0])
+        shift_y = np.zeros(y_arr.shape[0])
+        shift_z = np.zeros(z_arr.shape[0])
+
+        for ii in range(2):
+            for jj in range(2):
+                for kk in range(2):
+                    weight = (((1 - ddx) + ii * (-1 + 2 * ddx)) *
+                              ((1 - ddy) + jj * (-1 + 2 * ddy)) *
+                              ((1 - ddz) + kk * (-1 + 2 * ddz)))
+                    if self.is_box:
+                        pos = ((i + ii) % self.nbins, (j + jj) % self.nbins, (k + kk) % self.nbins)
+                    else:
+                        pos = (i + ii, j + jj, k + kk)
+                    shift_x += f_x[pos] * weight
+                    shift_y += f_y[pos] * weight
+                    shift_z += f_z[pos] * weight
+
+        return shift_x, shift_y, shift_z
+
     def export_shift_pos(self, root1, root2='', rsd_only=True):
         """method to write the shifted positions to file"""
 
@@ -435,19 +477,35 @@ class Recon:
             # t.write(out_file, format='fits')
             #np.save(out_file, output)
             np.savetxt(out_file+".dat", output, fmt='%.4f')
-            if not rsd_only and self.ran is not None:
+            if not rsd_only:
                 print("==> Saving shifted randoms.", flush=True)
                 # same as above, but for the randoms as well
-                output = np.ones((self.ran.size, 4))
-                output[:, 0] = self.ran.newx
-                output[:, 1] = self.ran.newy
-                output[:, 2] = self.ran.newz
-                if self.ran.weights_model == 1:
-                    output[:, 3] = self.ran.get_weights(fkp=True, syst_wts=True) #Put fkp true since there are the original weights
-                    #output[:, 3] = 1  # we don't include any systematics weights for the random catalogue
-                elif self.ran.weights_model == 2 or self.ran.weights_model == 3:
-                    output[:, 3] = self.ran.get_weights(fkp=True, syst_wts=True) #Put fkp true since there are the original weights
-                out_file = root2 + '_shift'
+                
+                if self.ran is not None:
+                    output = np.ones((self.ran.size, 4))
+                    output[:, 0] = self.ran.newx
+                    output[:, 1] = self.ran.newy
+                    output[:, 2] = self.ran.newz
+                    if self.ran.weights_model == 1:
+                        output[:, 3] = self.ran.get_weights(fkp=True, syst_wts=True) #Put fkp true since there are the original weights
+                        #output[:, 3] = 1  # we don't include any systematics weights for the random catalogue
+                    elif self.ran.weights_model == 2 or self.ran.weights_model == 3:
+                        output[:, 3] = self.ran.get_weights(fkp=True, syst_wts=True) #Put fkp true since there are the original weights
+                    out_file = root2 + '_shift'
+                else:
+                    print(f"==> No randoms provided, creating randoms in (0, {self.cat.box_length}).", flush=True)
+                    output=self.cat.box_length * np.random.random(3 * 10 * self.cat.size).reshape((10 *self.cat.size, 3))
+                    print("==> Shifting generated randoms", flush=True)
+                    shift_x, shift_y, shift_z = \
+                        self.get_shift_array(output[:,0], output[:,1], output[:,2], self.psi_x.real, self.psi_y.real, self.psi_z.real)
+                    output += np.c_[shift_x, shift_y, shift_z]
+                    # account for PBC
+                    for i in range(3):
+                        output[output[:,i]>=self.cat.box_length,i]-= self.cat.box_length
+                        output[output[:,i]<0,i]+= self.cat.box_length
+                    out_file = root1 + '.ran' + '_shift'
+                    print(f"==> Saving randoms to {out_file}", flush=True)
+                    
                 # t = Table(output, names=('RA', 'DEC', 'Z', 'WEIGHT_SYSTOT'))
                 # t.write(out_file, format='fits')
                 #np.save(out_file, output)
