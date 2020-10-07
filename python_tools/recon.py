@@ -503,7 +503,10 @@ class Recon:
                     for i in range(3):
                         output[output[:,i]>=self.cat.box_length,i]-= self.cat.box_length
                         output[output[:,i]<0,i]+= self.cat.box_length
-                    out_file = root1 + '.ran' + '_shift'
+                    if root2 != '': 
+                        out_file = root2 + '_shift'
+                    else:
+                        out_file = root1 + '.ran' + '_shift'
                     print(f"==> Saving randoms to {out_file}", flush=True)
                     
                 # t = Table(output, names=('RA', 'DEC', 'Z', 'WEIGHT_SYSTOT'))
