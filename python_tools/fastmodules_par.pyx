@@ -1,5 +1,6 @@
 # distutils: extra_compile_args=-fopenmp
 # distutils: extra_link_args=-fopenmp
+# cython: language_level=3
 cimport numpy as np
 cimport cython
 from libc.math cimport exp
@@ -12,8 +13,8 @@ cdef struct PARTICLE:
   int nadj_count
   int *adj
 
-def mult_kx(np.ndarray [np.complex128_t, ndim=3] deltaout, np.ndarray [np.complex128_t, ndim=3] delta,
-            np.ndarray [np.float64_t, ndim=1] k, double bias):
+def mult_kx(double complex[:,:,:] deltaout, double complex[:,:,:] delta,
+            double complex[:] k, double bias):
     cdef int N = delta.shape[0]
     cdef int ix,iy,iz
     for ix in range(N):
@@ -22,8 +23,8 @@ def mult_kx(np.ndarray [np.complex128_t, ndim=3] deltaout, np.ndarray [np.comple
           deltaout[ix,iy,iz] = delta[ix,iy,iz] * (-1.0j) * k[ix] / bias
     return deltaout
 
-def mult_ky(np.ndarray [np.complex128_t, ndim=3] deltaout, np.ndarray [np.complex128_t, ndim=3] delta,
-            np.ndarray [np.float64_t, ndim=1] k, double bias):
+def mult_ky(double complex[:,:,:] deltaout, double complex[:,:,:] delta,
+            double complex[:] k, double bias):
     cdef int N = delta.shape[0]
     cdef int ix,iy,iz
     for ix in range(N):
@@ -32,8 +33,8 @@ def mult_ky(np.ndarray [np.complex128_t, ndim=3] deltaout, np.ndarray [np.comple
           deltaout[ix,iy,iz] = delta[ix,iy,iz] * (-1.0j) * k[iy] / bias
     return deltaout
 
-def mult_kz(np.ndarray [np.complex128_t, ndim=3] deltaout, np.ndarray [np.complex128_t, ndim=3] delta,
-            np.ndarray [np.float64_t, ndim=1] k, double bias):
+def mult_kz(double complex[:,:,:] deltaout, double complex[:,:,:] delta,
+            double complex[:] k, double bias):
     cdef int N = delta.shape[0]
     cdef int ix,iy,iz
     for ix in range(N):
@@ -42,8 +43,8 @@ def mult_kz(np.ndarray [np.complex128_t, ndim=3] deltaout, np.ndarray [np.comple
           deltaout[ix,iy,iz] = delta[ix,iy,iz] * (-1.0j) * k[iz] / bias
     return deltaout
 
-def mult_norm(np.ndarray [np.complex128_t, ndim=3] rhoout, np.ndarray [np.complex128_t, ndim=3] rhoin,
-             np.ndarray [np.float64_t, ndim=3] norm):
+def mult_norm(double complex[:,:,:] rhoout, double complex[:,:,:] rhoin,
+             double complex[:,:,:] norm):
     cdef int N = rhoin.shape[0]
     cdef int ix,iy,iz
     for ix in range(N):
@@ -52,8 +53,8 @@ def mult_norm(np.ndarray [np.complex128_t, ndim=3] rhoout, np.ndarray [np.comple
           rhoout[ix,iy,iz] = rhoin[ix,iy,iz] * norm[ix,iy,iz]
     return rhoout
 
-def divide_k2(np.ndarray [np.complex128_t, ndim=3] deltaout, np.ndarray [np.complex128_t, ndim=3] delta,
-              np.ndarray [np.float64_t, ndim=1] k):
+def divide_k2(double complex[:,:,:] deltaout, double complex[:,:,:] delta,
+              double[:] k):              
     cdef int N = delta.shape[0]
     cdef int ix,iy,iz
     cdef double kx,ky,kz,k2
@@ -164,8 +165,121 @@ def allocate_gal_cic(
 
   return delta
 
-def normalize_delta_survey(np.ndarray [np.complex128_t, ndim=3] delta, np.ndarray [np.float64_t, ndim=3] rhog,
-                        np.ndarray [np.float64_t, ndim=3] rhor, double alpha, double ran_min):
+@cython.boundscheck(False)
+@cython.wraparound(False)
+def get_shift_array(double[:] x_arr, double[:] y_arr, double[:] z_arr, double[:,:,:] f_x, double[:,:,:] f_y,
+                    double[:,:,:] f_z, double xmin, double ymin, double zmin, double binsize, bint is_box, int nbins,
+                    double[:] shift_x, double[:] shift_y, double[:] shift_z, int n_threads):
+        """Given grid of f_x, f_y and f_z values, uses interpolation scheme to compute
+        appropriate values at the galaxy positions"""
+
+        cdef int i, j, k, ii, jj, kk, posx, posy, posz
+        cdef float xpos, ypos, zpos, ddx, ddy, ddz, weight
+        cdef Py_ssize_t n
+        cdef size_t npart = x_arr.shape[0]
+
+        for n in prange(npart, nogil=True, num_threads=n_threads):
+
+          xpos = (x_arr[n] - xmin) / binsize
+          ypos = (y_arr[n] - ymin) / binsize
+          zpos = (z_arr[n] - zmin) / binsize
+        
+
+          i = <int> xpos
+          j = <int> ypos
+          k = <int> zpos
+
+          ddx = xpos - i
+          ddy = ypos - j
+          ddz = zpos - k
+
+        
+
+          for ii in range(2):
+              for jj in range(2):
+                  for kk in range(2):
+                      weight = (((1 - ddx) + ii * (-1 + 2 * ddx)) *
+                                ((1 - ddy) + jj * (-1 + 2 * ddy)) *
+                                ((1 - ddz) + kk * (-1 + 2 * ddz)))
+                      if is_box:
+                          posx = (i + ii) % nbins
+                          posy = (j + jj) % nbins
+                          posz = (k + kk) % nbins
+                      else:
+                          posx = i + ii
+                          posy = j + jj
+                          posz = k + kk
+                      shift_x[n] = shift_x[n] + f_x[posx, posy, posz] * weight
+                      shift_y[n] = shift_y[n] + f_y[posx, posy, posz] * weight
+                      shift_z[n] = shift_z[n] + f_z[posx, posy, posz] * weight
+
+        return shift_x, shift_y, shift_z
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+def apply_shift_array(double[:] x_arr, double[:] y_arr, double[:] z_arr, double[:,:,:] f_x, double[:,:,:] f_y,
+                    double[:,:,:] f_z, double xmin, double ymin, double zmin, double binsize, bint is_box, int nbins,
+                    float box_length, double[:] new_x_arr, double[:] new_y_arr, double[:] new_z_arr, int n_threads):
+        """Given grid of f_x, f_y and f_z values, uses interpolation scheme to compute
+        appropriate values at the galaxy positions"""
+
+        cdef int i, j, k, ii, jj, kk, posx, posy, posz
+        cdef float xpos, ypos, zpos, ddx, ddy, ddz, weight, shift_x, shift_y, shift_z
+        cdef Py_ssize_t n
+        cdef size_t npart = x_arr.shape[0]
+
+
+        for n in prange(npart, nogil=True, num_threads=n_threads):
+
+          xpos = (x_arr[n] - xmin) / binsize
+          ypos = (y_arr[n] - ymin) / binsize
+          zpos = (z_arr[n] - zmin) / binsize
+        
+
+          i = <int> xpos
+          j = <int> ypos
+          k = <int> zpos
+
+          ddx = xpos - i
+          ddy = ypos - j
+          ddz = zpos - k
+
+        
+          shift_x = 0
+          shift_y = 0
+          shift_z = 0
+          for ii in range(2):
+              for jj in range(2):
+                  for kk in range(2):
+                      weight = (((1 - ddx) + ii * (-1 + 2 * ddx)) *
+                                ((1 - ddy) + jj * (-1 + 2 * ddy)) *
+                                ((1 - ddz) + kk * (-1 + 2 * ddz)))
+                      if is_box:
+                          posx = (i + ii) % nbins
+                          posy = (j + jj) % nbins
+                          posz = (k + kk) % nbins
+                      else:
+                          posx = i + ii
+                          posy = j + jj
+                          posz = k + kk
+                      shift_x = shift_x + f_x[posx, posy, posz] * weight
+                      shift_y = shift_y + f_y[posx, posy, posz] * weight
+                      shift_z = shift_z + f_z[posx, posy, posz] * weight
+
+
+          new_x_arr[n] = x_arr[n] + shift_x
+          new_y_arr[n] = y_arr[n] + shift_y
+          new_z_arr[n] = z_arr[n] + shift_z
+
+          if is_box:
+            new_x_arr[n] = (new_x_arr[n] + box_length) % box_length
+            new_y_arr[n] = (new_y_arr[n] + box_length) % box_length
+            new_z_arr[n] = (new_z_arr[n] + box_length) % box_length
+
+        return new_x_arr, new_y_arr, new_z_arr
+
+def normalize_delta_survey(double complex[:,:,:] delta, double[:,:,:] rhog,
+                        double[:,:,:] rhor, double alpha, double ran_min):
 
   cdef int N = rhog.shape[0]
   cdef int ix, iy, iz
@@ -179,7 +293,7 @@ def normalize_delta_survey(np.ndarray [np.complex128_t, ndim=3] delta, np.ndarra
 
   return delta
 
-def normalize_delta_box(np.ndarray [np.complex128_t, ndim=3] delta, np.ndarray [np.float64_t, ndim=3] rhog,
+def normalize_delta_box(double complex[:,:,:] delta, double[:,:,:] rhog,
                         int npart):
 
   cdef int N = rhog.shape[0]
@@ -191,8 +305,8 @@ def normalize_delta_box(np.ndarray [np.complex128_t, ndim=3] delta, np.ndarray [
 
   return delta
 
-def normalize_rho_survey(np.ndarray [np.float64_t, ndim=3] rho_out, np.ndarray [np.float64_t, ndim=3] rhog,
-                        np.ndarray [np.float64_t, ndim=3] rhor, double alpha, double ran_min):
+def normalize_rho_survey(double[:,:,:] rho_out, double[:,:,:] rhog,
+                        double[:,:,:] rhor, double alpha, double ran_min):
 
   cdef int N = rhog.shape[0]
   cdef int ix, iy, iz
@@ -206,7 +320,7 @@ def normalize_rho_survey(np.ndarray [np.float64_t, ndim=3] rho_out, np.ndarray [
 
   return rho_out
 
-def normalize_rho_box(np.ndarray [np.float64_t, ndim=3] rhog, int npart):
+def normalize_rho_box(double[:,:,:] rhog, int npart):
 
   cdef int N = rhog.shape[0]
   cdef int ix, iy, iz
@@ -217,7 +331,7 @@ def normalize_rho_box(np.ndarray [np.float64_t, ndim=3] rhog, int npart):
 
   return rhog
 
-def survey_mask(np.ndarray [np.int_t, ndim=1] mask, np.ndarray [np.float64_t, ndim=3] rhor, double ran_min):
+def survey_mask(int[:] mask, double[:,:,:] rhor, double ran_min):
 
   cdef int N = rhor.shape[0]
   cdef int ix, iy, iz
@@ -229,8 +343,8 @@ def survey_mask(np.ndarray [np.int_t, ndim=1] mask, np.ndarray [np.float64_t, nd
 
   return mask
 
-def survey_cuts_logical(np.ndarray [np.int_t, ndim=1] out, np.ndarray [np.float64_t, ndim=1] veto,
-                        np.ndarray [np.float64_t, ndim=1] redshift, double zmin, double zmax):
+def survey_cuts_logical(int[:] out, double[:] veto,
+                        double[:] redshift, double zmin, double zmax):
 
   cdef int N = redshift.shape[0]
   cdef int i
@@ -242,8 +356,8 @@ def survey_cuts_logical(np.ndarray [np.int_t, ndim=1] out, np.ndarray [np.float6
 
   return out
 
-def voxelvoid_cuts(np.ndarray [np.int_t, ndim=1] select, np.ndarray [np.int_t, ndim=1] mask,
-                   np.ndarray [np.float64_t, ndim=2] rawvoids, double min_dens_cut):
+def voxelvoid_cuts(int[:] select, int[:] mask,
+                   double[:,:] rawvoids, double min_dens_cut):
 
   cdef int N = rawvoids.shape[0]
   cdef int i, vox
@@ -257,8 +371,8 @@ def voxelvoid_cuts(np.ndarray [np.int_t, ndim=1] select, np.ndarray [np.int_t, n
 
   return select
 
-def voxelcluster_cuts(np.ndarray [np.int_t, ndim=1] select, np.ndarray [np.int_t, ndim=1] mask,
-                   np.ndarray [np.float64_t, ndim=2] rawclusters, double max_dens_cut):
+def voxelcluster_cuts(int[:] select, int[:] mask,
+                   double[:,:] rawclusters, double max_dens_cut):
 
   cdef int N = rawclusters.shape[0]
   cdef int i, vox
@@ -271,8 +385,8 @@ def voxelcluster_cuts(np.ndarray [np.int_t, ndim=1] select, np.ndarray [np.int_t
 
   return select
 
-def get_member_densities(np.ndarray [np.float64_t, ndim=1] member_dens, np.ndarray [np.int_t, ndim=1] voxels,
-                         np.ndarray [np.float64_t, ndim=1] rho):
+def get_member_densities(double[:] member_dens, int[:] voxels,
+                         double[:] rho):
 
   cdef int N = len(voxels)
   cdef int i

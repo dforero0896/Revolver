@@ -72,19 +72,21 @@ def plot_2pcf(tpcf, ax, **kwargs):
         pass
     ax[1].plot(s, s**2*tpcf['quad'], **kwargs)
 
-fig, ax = plt.subplots(1,2, figsize=(20,10))
+if __name__ == '__main__':
 
-plot_2pcf(compute_2pcf('tests/CATALPTCICz0.466G960S1005638091_zspace_pos_shift', 'natural', 'ss'), ax, label='No rand natural ss')
-plot_2pcf(compute_2pcf('tests/CATALPTCICz0.466G960S1005638091_zspace_pos_shift', 'ls', 'ss'), ax, label = 'No rand ls ss')
-plot_2pcf(compute_2pcf('tests/CATALPTCICz0.466G960S1005638091_zspace_pos_shift', 'natural', 'rr'), ax, label='No rand natural rranalyt')
-plot_2pcf(compute_2pcf('tests/CATALPTCICz0.466G960S1005638091_zspace_wran_pos_shift', 'natural', 'ss'), ax, label='Ran ss natural')
-plot_2pcf(compute_2pcf('tests/CATALPTCICz0.466G960S1005638091_zspace_wran_pos_shift', 'natural', 'rr'), ax, label='Ran rranalyt natural')
-plot_2pcf(compute_2pcf('tests/CATALPTCICz0.466G960S1005638091_zspace_wran_pos_shift', 'ls', 'ss'), ax, label='Ran ss ls')
-plot_2pcf(compute_2pcf('tests/CATALPTCICz0.466G960S1005638091_zspace_wran_pos_shift', 'ls', 'rr'), ax, label='Ran rranalyt ls')
-plot_2pcf(compute_2pcf('tests/CATALPTCICz0.466G960S1005638091_zspace_wran_nopad_pos_shift', 'ls', 'ss'), ax, label='Ran ss nopad ls', ls = ':', lw=4)
-plot_2pcf(compute_2pcf('tests/CATALPTCICz0.466G960S1005638091_zspace_wran_nopad_pos_shift', 'ls', 'rr'), ax, label='Ran rranalyt nopad ls', ls = ':', lw=4)
+    fig, ax = plt.subplots(1,2, figsize=(20,10))
 
-plot_2pcf(compute_2pcf('tests/CATALPTCICz0.466G960S1005638091_zspace_wran_nopad_pos_shift', 'ls', 'rr', use_rr=True), ax, label='Ran only rranalyt nopad ls', ls='--', lw=3)
-plot_2pcf(compute_2pcf('tests/CATALPTCICz0.466G960S1005638091_zspace_wran_nopad_pos_shift', 'natural', 'rr', use_rr=True), ax, label='Ran only rranalyt nopad natural', ls='--', lw=3)
-ax[0].legend()
-fig.savefig('notebooks/estimators.png', dpi=200)s
+    plot_2pcf(compute_2pcf('tests/CATALPTCICz0.466G960S1005638091_zspace_pos_shift', 'natural', 'ss'), ax, label='No rand natural ss')
+    plot_2pcf(compute_2pcf('tests/CATALPTCICz0.466G960S1005638091_zspace_pos_shift', 'ls', 'ss'), ax, label = 'No rand ls ss')
+    plot_2pcf(compute_2pcf('tests/CATALPTCICz0.466G960S1005638091_zspace_pos_shift', 'natural', 'rr'), ax, label='No rand natural rranalyt')
+    plot_2pcf(compute_2pcf('tests/CATALPTCICz0.466G960S1005638091_zspace_wran_pos_shift', 'natural', 'ss'), ax, label='Ran ss natural')
+    plot_2pcf(compute_2pcf('tests/CATALPTCICz0.466G960S1005638091_zspace_wran_pos_shift', 'natural', 'rr'), ax, label='Ran rranalyt natural')
+    plot_2pcf(compute_2pcf('tests/CATALPTCICz0.466G960S1005638091_zspace_wran_pos_shift', 'ls', 'ss'), ax, label='Ran ss ls')
+    plot_2pcf(compute_2pcf('tests/CATALPTCICz0.466G960S1005638091_zspace_wran_pos_shift', 'ls', 'rr'), ax, label='Ran rranalyt ls')
+    plot_2pcf(compute_2pcf('tests/CATALPTCICz0.466G960S1005638091_zspace_wran_nopad_pos_shift', 'ls', 'ss'), ax, label='Ran ss nopad ls', ls = ':', lw=4)
+    plot_2pcf(compute_2pcf('tests/CATALPTCICz0.466G960S1005638091_zspace_wran_nopad_pos_shift', 'ls', 'rr'), ax, label='Ran rranalyt nopad ls', ls = ':', lw=4)
+
+    plot_2pcf(compute_2pcf('tests/CATALPTCICz0.466G960S1005638091_zspace_wran_nopad_pos_shift', 'ls', 'rr', use_rr=True), ax, label='Ran only rranalyt nopad ls', ls='--', lw=3)
+    plot_2pcf(compute_2pcf('tests/CATALPTCICz0.466G960S1005638091_zspace_wran_nopad_pos_shift', 'natural', 'rr', use_rr=True), ax, label='Ran only rranalyt nopad natural', ls='--', lw=3)
+    ax[0].legend()
+    fig.savefig('notebooks/estimators.png', dpi=200)

@@ -464,7 +464,7 @@ class Recon:
 
         return shift_x, shift_y, shift_z
 
-    def export_shift_pos(self, root1, root2='', rsd_only=True):
+    def export_shift_pos(self, root1, root2='', rsd_only=True, save_mode=1):
         """method to write the shifted positions to file"""
 
         if self.is_box:
@@ -475,8 +475,11 @@ class Recon:
             out_file = root1 + '_shift'
             # t = Table(output, names=('X', 'Y', 'Z'))
             # t.write(out_file, format='fits')
-            #np.save(out_file, output)
-            np.savetxt(out_file+".dat", output, fmt='%.4f')
+            if save_mode == 2:
+              np.save(out_file+".npy", output.astype(np.float32))
+            elif save_mode==1:
+              np.savetxt(out_file+".dat"+".TMP", output, fmt='%.4f')
+              os.rename(out_file+".dat"+".TMP", out_file+".dat")
             if not rsd_only:
                 print("==> Saving shifted randoms.", flush=True)
                 # same as above, but for the randoms as well
@@ -492,12 +495,14 @@ class Recon:
                     elif self.ran.weights_model == 2 or self.ran.weights_model == 3:
                         output[:, 3] = self.ran.get_weights(fkp=True, syst_wts=True) #Put fkp true since there are the original weights
                     out_file = root2 + '_shift'
+                    print(f"==> Saving randoms to {out_file}", flush=True)
                 else:
                     print(f"==> No randoms provided, creating randoms in (0, {self.cat.box_length}).", flush=True)
                     output=self.cat.box_length * np.random.random(3 * 10 * self.cat.size).reshape((10 *self.cat.size, 3))
                     print("==> Shifting generated randoms", flush=True)
                     shift_x, shift_y, shift_z = \
                         self.get_shift_array(output[:,0], output[:,1], output[:,2], self.psi_x.real, self.psi_y.real, self.psi_z.real)
+                    print("==> Shifts computed, adding...", flush=True)
                     output += np.c_[shift_x, shift_y, shift_z]
                     # account for PBC
                     for i in range(3):
@@ -511,8 +516,11 @@ class Recon:
                     
                 # t = Table(output, names=('RA', 'DEC', 'Z', 'WEIGHT_SYSTOT'))
                 # t.write(out_file, format='fits')
-                #np.save(out_file, output)
-                np.savetxt(out_file+".dat", output, fmt='%.4f')
+                if save_mode == 2:
+                  np.save(out_file+".npy", output.astype(np.float32))
+                elif save_mode==1:
+                  np.savetxt(out_file+".dat"+".TMP", output, fmt='%.4f')
+                  os.rename(out_file+".dat"+".TMP", out_file+".dat")
         else:
             # recalculate weights, as we don't want the FKP weighting for void-finding
             #self.cat.weight = self.cat.get_weights(fkp=False, syst_wts=True)
@@ -526,8 +534,11 @@ class Recon:
             out_file = root1 + '_shift'
             # t = Table(output, names=('RA', 'DEC', 'Z', 'WEIGHT_SYSTOT', 'COMP'))
             # t.write(out_file, format='fits')
-            #np.save(out_file, output)
-            np.savetxt(out_file+".dat", output)
+            if save_mode == 2:
+              np.save(out_file+".npy", output.astype(np.float32))
+            elif save_mode==1:
+              np.savetxt(out_file+".dat"+".TMP", output, fmt='%.4f')
+              os.rename(out_file+".dat"+".TMP", out_file+".dat")
 
             if not rsd_only:
                 print("==> Saving shifted randoms.")
@@ -543,11 +554,14 @@ class Recon:
                 elif self.ran.weights_model == 2 or self.ran.weights_model == 3:
                     output[:, 3] = self.ran.get_weights(fkp=True, syst_wts=True) #Put fkp true since there are the original weights
                 out_file = root2 + '_shift'
+                print(f"==> Saving randoms to {out_file}", flush=True)
                 # t = Table(output, names=('RA', 'DEC', 'Z', 'WEIGHT_SYSTOT'))
                 # t.write(out_file, format='fits')
-                #np.save(out_file, output)
-                np.savetxt(out_file+".dat", output)
-
+                if save_mode == 2:
+                  np.save(out_file+".npy", output.astype(np.float32))
+                elif save_mode==1:
+                  np.savetxt(out_file+".dat"+".TMP", output, fmt='%.4f')
+                  os.rename(out_file+".dat"+".TMP", out_file+".dat")
     def cart_to_radecz(self, x, y, z):
 
         dist = np.sqrt(x ** 2 + y ** 2 + z ** 2)

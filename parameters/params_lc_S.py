@@ -9,8 +9,8 @@ nthreads = 32     # set to the number of CPUs available, more is better
 # ================================ #
 
 # ========= file handling options ========= #
-handle = 'Patchy-Mocks-DR12CMASSLOWZTOT-N-V6C-Portsmouth-mass_0010'  # string to identify the run; used to set filenames
-handle_ran = 'Random-DR12CMASSLOWZTOT-N-V6C-x20-VT-FC_0010'
+handle = 'Patchy-Mocks-DR12CMASSLOWZ-S-V6C-Portsmouth-mass_0010'  # string to identify the run; used to set filenames
+handle_ran = 'Random-DR12CMASSLOWZ-S-V6C-x20-VT-FC_0010'
 output_folder = 'tests/'   # /path/to/folder/ where output should be placed
 # ========================================= #
 
@@ -31,7 +31,7 @@ niter = 3       # number of iterations in the FFT reconstruction method, 3 is su
 # ========================================= #
 
 # ======= input galaxy/tracer data options =========== #
-tracer_file = 'tests/Patchy-Mocks-DR12CMASSLOWZTOT-N-V6C-Portsmouth-mass_0010.dat'     # /path/to/file with input data
+tracer_file = 'tests/Patchy-Mocks-DR12CMASSLOWZ-S-V6C-Portsmouth-mass_0010.dat'     # /path/to/file with input data
 tracer_file_type = 3  # 1 for FITS file, 2 for array in numpy pickle format (.npy), 3 for array in ASCII format
 # NOTE: for FITS files, the tracer coordinates should be specified using appropriate field names
 # current options are 'RA', 'DEC' and 'Z' for survey-like data on the sky, or 'X', 'Y', 'Z' for simulation boxes
@@ -67,7 +67,7 @@ comp = False    # sector completeness
 # ====== input randoms options ======= #
 # for survey-like data, randoms characterize the window function and MUST be provided for reconstruction and
 # voxel void-finding (not necessary for ZOBOV alone)
-random_file = 'tests/Random-DR12CMASSLOWZTOT-N-V6C-x20-VT-FC.dat'   # /path/to/file containing randoms data
+random_file = 'tests/Random-DR12CMASSLOWZ-S-V6C-x20-VT-FC.dat'   # /path/to/file containing randoms data
 random_file_type = 3  # 1 for FITS file, 2 for array in numpy pickle format (.npy), 3 for array in ASCII format
 # if random_file_type = 2 or 3, specify which columns of the array contain the (RA, Dec, redshift) coordinates
 random_posn_cols = [0, 1, 2]
