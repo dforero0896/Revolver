@@ -383,7 +383,7 @@ class Recon:
         for c in [self.cat, self.ran]:
             if c is None: continue
             if self.is_box: box_length = c.box_length
-            else: box_length=999
+            else: box_length=99999999999
             fastmodules.apply_shift_array(c.newx, c.newy, c.newz, self.psi_x.real, self.psi_y.real, self.psi_z.real,
                     self.xmin, self.ymin, self.zmin, self.binsize, self.is_box, self.nbins,
                     box_length, c.newx, c.newy, c.newz, self.nthreads)
