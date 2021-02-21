@@ -14,7 +14,7 @@ cdef struct PARTICLE:
   int *adj
 
 def mult_kx(double complex[:,:,:] deltaout, double complex[:,:,:] delta,
-            double complex[:] k, double bias):
+            double[:] k, double bias):
     cdef int N = delta.shape[0]
     cdef int ix,iy,iz
     for ix in range(N):
@@ -24,7 +24,7 @@ def mult_kx(double complex[:,:,:] deltaout, double complex[:,:,:] delta,
     return deltaout
 
 def mult_ky(double complex[:,:,:] deltaout, double complex[:,:,:] delta,
-            double complex[:] k, double bias):
+            double[:] k, double bias):
     cdef int N = delta.shape[0]
     cdef int ix,iy,iz
     for ix in range(N):
@@ -34,7 +34,7 @@ def mult_ky(double complex[:,:,:] deltaout, double complex[:,:,:] delta,
     return deltaout
 
 def mult_kz(double complex[:,:,:] deltaout, double complex[:,:,:] delta,
-            double complex[:] k, double bias):
+            double[:] k, double bias):
     cdef int N = delta.shape[0]
     cdef int ix,iy,iz
     for ix in range(N):
@@ -44,7 +44,7 @@ def mult_kz(double complex[:,:,:] deltaout, double complex[:,:,:] delta,
     return deltaout
 
 def mult_norm(double complex[:,:,:] rhoout, double complex[:,:,:] rhoin,
-             double complex[:,:,:] norm):
+             double[:,:,:] norm):
     cdef int N = rhoin.shape[0]
     cdef int ix,iy,iz
     for ix in range(N):
@@ -194,7 +194,9 @@ def get_shift_array(double[:] x_arr, double[:] y_arr, double[:] z_arr, double[:,
           ddz = zpos - k
 
         
-
+          shift_x[n] = 0
+          shift_y[n] = 0
+          shift_z[n] = 0
           for ii in range(2):
               for jj in range(2):
                   for kk in range(2):
@@ -213,7 +215,7 @@ def get_shift_array(double[:] x_arr, double[:] y_arr, double[:] z_arr, double[:,
                       shift_y[n] = shift_y[n] + f_y[posx, posy, posz] * weight
                       shift_z[n] = shift_z[n] + f_z[posx, posy, posz] * weight
 
-        return shift_x, shift_y, shift_z
+        
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -276,7 +278,6 @@ def apply_shift_array(double[:] x_arr, double[:] y_arr, double[:] z_arr, double[
             new_y_arr[n] = (new_y_arr[n] + box_length) % box_length
             new_z_arr[n] = (new_z_arr[n] + box_length) % box_length
 
-        return new_x_arr, new_y_arr, new_z_arr
 
 def normalize_delta_survey(double complex[:,:,:] delta, double[:,:,:] rhog,
                         double[:,:,:] rhor, double alpha, double ran_min):

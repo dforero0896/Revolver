@@ -93,7 +93,8 @@ if parms.do_recon:
     
     print("==> Before apply_shifts_full()")
     recon.summary()
-    recon.apply_shifts_full()    
+    #recon.apply_shifts_full()    
+    recon.fast_apply_shifts_full()
     print("==> After apply_shifts_full()")
     recon.summary()
     

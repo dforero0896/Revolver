@@ -9,6 +9,7 @@ import python_tools.fastmodules_par as fastmodules
 #import python_tools.fastmodules as fastmodules
 import pyfftw
 from astropy.table import Table
+import time
 #from python_tools.numba_modules import allocate_gal_cic_kernel
 
 #exit()
@@ -255,7 +256,19 @@ class Recon:
         if self.verbose:
             print('Calculating shifts...')
         sys.stdout.flush()
-        shift_x, shift_y, shift_z = self.get_shift(cat, psi_x.real, psi_y.real, psi_z.real, use_newpos=True)
+        
+        #start = time.time()
+        #shift_x, shift_y, shift_z = self.get_shift(cat, psi_x.real, psi_y.real, psi_z.real, use_newpos=True)
+        #print(f"DEBUG: Original shift call took {time.time() - start} s", flush=True)
+        start = time.time()
+        shift_x = np.zeros_like(cat.x)
+        shift_y = np.zeros_like(cat.y)
+        shift_z = np.zeros_like(cat.z)
+        fastmodules.get_shift_array(cat.newx, cat.newy, cat.newz, psi_x.real, psi_y.real, psi_z.real, self.xmin,
+                                    self.ymin, self.zmin, self.binsize, self.is_box, self.nbins,
+                                    shift_x, shift_y, shift_z, self.nthreads)
+        print(f"DEBUG: New shift call took {time.time() - start} s", flush=True)
+        #print(f"DEBUG: Accurate? shift x: {np.allclose(shift_x, shift_x_test)}, shift y: {np.allclose(shift_y, shift_y_test)}, shift z: {np.allclose(shift_z, shift_z_test)}", flush=True)
         # Up to here the displacement field is correct for real space catalogs.
 
         # now we update estimates of the Psi field in the following way:
@@ -292,12 +305,14 @@ class Recon:
                 for i in range(10):
                     print('%0.3f %0.3f %0.3f %0.3f %0.3f' % (shift_x[i], shift_y[i], shift_z[i], cat.z[i], cat.newz[i]))
 
+
             else:
                 print('Debug: first 10 x,y,z shifts and old and new observer distances')
                 for i in range(10):
                     oldr = np.sqrt(cat.x[i] ** 2 + cat.y[i] ** 2 + cat.z[i] ** 2)
                     newr = np.sqrt(cat.newx[i] ** 2 + cat.newy[i] ** 2 + cat.newz[i] ** 2)
                     print('%0.3f %0.3f %0.3f %0.3f %0.3f' % (shift_x[i], shift_y[i], shift_z[i], oldr, newr))
+                
 
         # in the next loop of iteration, these new positions are used to compute next approximation of
         # the (real-space) galaxy density, and then this is used to get new estimate of Psi, etc.
@@ -364,6 +379,14 @@ class Recon:
                 c.newy[c.newy < 0] += c.box_length
                 c.newz[c.newz >= c.box_length] -= c.box_length
                 c.newz[c.newz < 0] += c.box_length
+    def fast_apply_shifts_full(self):
+        for c in [self.cat, self.ran]:
+            if c is None: continue
+            if self.is_box: box_length = c.box_length
+            else: box_length=999
+            fastmodules.apply_shift_array(c.newx, c.newy, c.newz, self.psi_x.real, self.psi_y.real, self.psi_z.real,
+                    self.xmin, self.ymin, self.zmin, self.binsize, self.is_box, self.nbins,
+                    box_length, c.newx, c.newy, c.newz, self.nthreads)
 
     def summary(self):
 
@@ -500,14 +523,19 @@ class Recon:
                     print(f"==> No randoms provided, creating randoms in (0, {self.cat.box_length}).", flush=True)
                     output=self.cat.box_length * np.random.random(3 * 10 * self.cat.size).reshape((10 *self.cat.size, 3))
                     print("==> Shifting generated randoms", flush=True)
-                    shift_x, shift_y, shift_z = \
-                        self.get_shift_array(output[:,0], output[:,1], output[:,2], self.psi_x.real, self.psi_y.real, self.psi_z.real)
+                    
+                    fastmodules.apply_shift_array(output[:,0], output[:,1], output[:,2], self.psi_x.real, self.psi_y.real, self.psi_z.real, self.xmin,
+                                                self.ymin, self.zmin, self.binsize, self.is_box, self.nbins, self.cat.box_length,
+                                                output[:,0], output[:,1], output[:,2], self.nthreads)
+                                                                    
+                    #shift_x, shift_y, shift_z = \
+                    #    self.get_shift_array(output[:,0], output[:,1], output[:,2], self.psi_x.real, self.psi_y.real, self.psi_z.real)
                     print("==> Shifts computed, adding...", flush=True)
-                    output += np.c_[shift_x, shift_y, shift_z]
+                    #output += np.c_[shift_x, shift_y, shift_z]
                     # account for PBC
-                    for i in range(3):
-                        output[output[:,i]>=self.cat.box_length,i]-= self.cat.box_length
-                        output[output[:,i]<0,i]+= self.cat.box_length
+                    #for i in range(3):
+                    #    output[output[:,i]>=self.cat.box_length,i]-= self.cat.box_length
+                    #    output[output[:,i]<0,i]+= self.cat.box_length
                     if root2 != '': 
                         out_file = root2 + '_shift'
                     else:
